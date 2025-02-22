@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\NbgDev.Pst.Api\NbgDev.Pst.Api.csproj" />
     <ProjectReference Include="..\..\NbgDev.Pst.Web\NbgDev.Pst.Web.csproj" />
   </ItemGroup>
 

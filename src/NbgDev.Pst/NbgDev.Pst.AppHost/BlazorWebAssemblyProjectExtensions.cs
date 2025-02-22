@@ -6,22 +6,24 @@ public static class BlazorWebAssemblyProjectExtensions
 {
     public static IResourceBuilder<ProjectResource> AddWebAssemblyProject<TProject>(
         this IDistributedApplicationBuilder builder, string name,
-        IResourceBuilder<ProjectResource> api)
+        IResourceBuilder<ProjectResource> api,
+        string apiUrlConfigurationKey = "ApiUrl")
         where TProject : IProjectMetadata, new()
     {
-        var projectbuilder = builder.AddProject<TProject>(name);
-        var p=new TProject();
-        string hostApi= p.ProjectPath;
-        var dir = Path.GetDirectoryName(hostApi);
+        var projectBuilder = builder.AddProject<TProject>(name);
+        var project = new TProject();
+
+        var dir = Path.GetDirectoryName(project.ProjectPath);
         ArgumentNullException.ThrowIfNull(dir);
+
         var wwwroot = Path.Combine(dir, "wwwroot");
-        if (!Directory.Exists(wwwroot)) {
+        if (!Directory.Exists(wwwroot))
+        {
             Directory.CreateDirectory(wwwroot);
         }
         var file = Path.Combine(wwwroot, "appsettings.json");
-        if (!File.Exists(file))
-            File.WriteAllText(file, "{}");
-        projectbuilder =projectbuilder.WithEnvironment(ctx =>
+
+        projectBuilder = projectBuilder.WithEnvironment(ctx =>
         {
             if (api.Resource.TryGetEndpoints(out var end))
             {
@@ -29,30 +31,34 @@ public static class BlazorWebAssemblyProjectExtensions
                 .Where(e => e.AllocatedEndpoint is not null)
                 .Select(e => e.AllocatedEndpoint!)
                 .ToList();
+
                 if (endpoints.Count > 0)
                 {
+                    var apiUrl = endpoints.First().UriString;
 
-                    var fileContent = File.ReadAllText(file);
+                    var fileContent = File.Exists(file)
+                        ? File.ReadAllText(file)
+                        : "{}";
 
-                    Dictionary<string, object>? dict;
-                    if (!string.IsNullOrWhiteSpace(fileContent))
-                        dict = new Dictionary<string, object>();
-                    else
-                        dict = JsonSerializer.Deserialize<Dictionary<string,object>>(fileContent!);
-
+                    Dictionary<string, object>? dict = string.IsNullOrWhiteSpace(fileContent)
+                        ? new Dictionary<string, object>()
+                        : JsonSerializer.Deserialize<Dictionary<string, object>>(fileContent!);
                     ArgumentNullException.ThrowIfNull(dict);
-                    dict["HOSTAPI"] = endpoints.First().UriString;
+
+                    dict[apiUrlConfigurationKey] = apiUrl;
+
                     JsonSerializerOptions opt = new JsonSerializerOptions(JsonSerializerOptions.Default)
-                            { WriteIndented=true};
-                    File.WriteAllText(file,JsonSerializer.Serialize(dict,opt));
-                    ctx.EnvironmentVariables["HOSTAPI"]=endpoints.First().UriString;
+                    {
+                        WriteIndented = true
+                    };
+                    File.WriteAllText(file, JsonSerializer.Serialize(dict, opt));
 
+                    ctx.EnvironmentVariables[apiUrlConfigurationKey] = apiUrl;
                 }
-
             }
-
         });
-        return projectbuilder;
+
+        return projectBuilder;
 
     }
 }
