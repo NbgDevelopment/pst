@@ -4,15 +4,12 @@ namespace NbgDev.Pst.AppHost;
 
 public static class BlazorWebAssemblyProjectExtensions
 {
-    public static IResourceBuilder<ProjectResource> AddWebAssemblyProject<TProject>(
-        this IDistributedApplicationBuilder builder, string name,
+    public static IResourceBuilder<ProjectResource> AddWebAssemblyProject(
+        this IResourceBuilder<ProjectResource> projectBuilder, string name,
         IResourceBuilder<ProjectResource> api,
         string apiUrlConfigurationKey = "ApiUrl")
-        where TProject : IProjectMetadata, new()
     {
-        var projectBuilder = builder.AddProject<TProject>(name);
-        var project = new TProject();
-
+        var project = projectBuilder.Resource.GetProjectMetadata();
         var dir = Path.GetDirectoryName(project.ProjectPath);
         ArgumentNullException.ThrowIfNull(dir);
 
