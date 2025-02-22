@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backend", "Backend", "{FF32
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbgDev.Pst.Api", "NbgDev.Pst.Api\NbgDev.Pst.Api.csproj", "{BD9A3EAE-6114-4D6B-8654-3E08A2FABCA6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbgDev.Pst.Api.Client", "NbgDev.Pst.Api.Client\NbgDev.Pst.Api.Client.csproj", "{C0344386-9148-468E-9E68-85BF80D9E24D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{BD9A3EAE-6114-4D6B-8654-3E08A2FABCA6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BD9A3EAE-6114-4D6B-8654-3E08A2FABCA6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BD9A3EAE-6114-4D6B-8654-3E08A2FABCA6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C0344386-9148-468E-9E68-85BF80D9E24D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C0344386-9148-468E-9E68-85BF80D9E24D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C0344386-9148-468E-9E68-85BF80D9E24D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C0344386-9148-468E-9E68-85BF80D9E24D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -51,5 +57,6 @@ Global
 		{704AEF2A-F354-4CE6-B4DA-F20CA65A3865} = {6E50604F-FAE6-4A3D-9D31-A6A1D36EC3D4}
 		{8207F26B-C59F-4A61-BDA1-D545412DCE34} = {6E50604F-FAE6-4A3D-9D31-A6A1D36EC3D4}
 		{BD9A3EAE-6114-4D6B-8654-3E08A2FABCA6} = {FF320F10-1F69-4C76-86EB-CB77A9605B01}
+		{C0344386-9148-468E-9E68-85BF80D9E24D} = {FF320F10-1F69-4C76-86EB-CB77A9605B01}
 	EndGlobalSection
 EndGlobal

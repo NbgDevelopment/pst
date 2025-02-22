@@ -19,6 +19,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\NbgDev.Pst.Api.Client\NbgDev.Pst.Api.Client.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Update="_Imports.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
     </Content>
