@@ -13,10 +13,9 @@ public partial class ProjectPage (IProjectService projectService, NavigationMana
 
     private Project? Project { get; set; }
 
-    protected override Task OnParametersSetAsync()
+    protected override async Task OnParametersSetAsync()
     {
-        Project = projectService.GetProjects().FirstOrDefault(p => p.Id == Id);
-        return Task.CompletedTask;
+        Project = (await projectService.GetProjects()).FirstOrDefault(p => p.Id == Id);
     }
 
     private void GoHome()

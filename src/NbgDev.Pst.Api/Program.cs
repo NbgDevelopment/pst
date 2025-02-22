@@ -7,6 +7,14 @@ builder.AddServiceDefaults();
 //    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddControllers();
+builder.Services.AddCors(cors =>
+{
+    cors.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins(builder.Configuration["Cors:AllowedOrigins"]!);
+        });
+});
 
 builder.Services.AddOpenApiDocument();
 
@@ -25,5 +33,7 @@ app.UseHttpsRedirection();
 //app.UseAuthorization();
 
 app.MapControllers();
+
+app.UseCors("AllowFrontend");
 
 app.Run();
