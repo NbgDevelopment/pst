@@ -1,0 +1,10 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All">Home</MudNavLink>
+    <MudNavGroup Title="Projects" Expanded="true">
+        @foreach (var project in Projects)
+        {
+            var href = $"/project/{project.Id}";
+            <MudNavLink Href="@href" Match="NavLinkMatch.Prefix">@project.Name</MudNavLink>
+        }
+    </MudNavGroup>
+</MudNavMenu>

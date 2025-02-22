@@ -1,0 +1,20 @@
+﻿@page "/project/{Id:guid}"
+
+<h3>Project</h3>
+
+@if (Project is null)
+{
+    <MudText>No project with ID @Id found.</MudText>
+}
+else
+{
+    <div>
+        <MudText>ID: @Project.Id</MudText>
+    </div>
+    <div>
+        <MudText>Name: @Project.Name</MudText>
+    </div>
+    <div>
+        <MudButton OnClick="GoHome">Go home</MudButton>
+    </div>
+}
