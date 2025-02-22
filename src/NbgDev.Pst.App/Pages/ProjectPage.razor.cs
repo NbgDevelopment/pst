@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using NbgDev.Pst.App.Models;
 using NbgDev.Pst.App.Services;
 
 namespace NbgDev.Pst.App.Pages;
 
+[Authorize]
 public partial class ProjectPage (IProjectService projectService, NavigationManager navigation)
 {
     [Parameter]
