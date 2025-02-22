@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
-using NbgDev.Pst.Web.Models;
-using NbgDev.Pst.Web.Services;
+using NbgDev.Pst.App.Models;
+using NbgDev.Pst.App.Services;
 
-namespace NbgDev.Pst.Web.Pages;
+namespace NbgDev.Pst.App.Pages;
 
 public partial class ProjectPage (IProjectService projectService, NavigationManager navigation)
 {

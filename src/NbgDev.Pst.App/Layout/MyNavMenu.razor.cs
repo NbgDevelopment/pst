@@ -1,7 +1,7 @@
-﻿using NbgDev.Pst.Web.Models;
-using NbgDev.Pst.Web.Services;
+﻿using NbgDev.Pst.App.Models;
+using NbgDev.Pst.App.Services;
 
-namespace NbgDev.Pst.Web.Layout;
+namespace NbgDev.Pst.App.Layout;
 
 public partial class MyNavMenu(IProjectService projectService)
 {

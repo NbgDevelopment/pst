@@ -11,6 +11,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{6E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbgDev.Pst.Web", "NbgDev.Pst.Web\NbgDev.Pst.Web.csproj", "{704AEF2A-F354-4CE6-B4DA-F20CA65A3865}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NbgDev.Pst.App", "NbgDev.Pst.App\NbgDev.Pst.App.csproj", "{8207F26B-C59F-4A61-BDA1-D545412DCE34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,11 +31,16 @@ Global
 		{704AEF2A-F354-4CE6-B4DA-F20CA65A3865}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{704AEF2A-F354-4CE6-B4DA-F20CA65A3865}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{704AEF2A-F354-4CE6-B4DA-F20CA65A3865}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8207F26B-C59F-4A61-BDA1-D545412DCE34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8207F26B-C59F-4A61-BDA1-D545412DCE34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8207F26B-C59F-4A61-BDA1-D545412DCE34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8207F26B-C59F-4A61-BDA1-D545412DCE34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{704AEF2A-F354-4CE6-B4DA-F20CA65A3865} = {6E50604F-FAE6-4A3D-9D31-A6A1D36EC3D4}
+		{8207F26B-C59F-4A61-BDA1-D545412DCE34} = {6E50604F-FAE6-4A3D-9D31-A6A1D36EC3D4}
 	EndGlobalSection
 EndGlobal

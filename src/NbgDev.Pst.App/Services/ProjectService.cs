@@ -1,6 +1,6 @@
-﻿using NbgDev.Pst.Web.Models;
+﻿using NbgDev.Pst.App.Models;
 
-namespace NbgDev.Pst.Web.Services;
+namespace NbgDev.Pst.App.Services;
 
 public class ProjectService : IProjectService
 {

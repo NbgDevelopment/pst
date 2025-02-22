@@ -1,4 +1,4 @@
-﻿namespace NbgDev.Pst.Web.Models;
+﻿namespace NbgDev.Pst.App.Models;
 
 public class Project
 {

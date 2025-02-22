@@ -1,4 +1,4 @@
-﻿namespace NbgDev.Pst.Web.Layout;
+﻿namespace NbgDev.Pst.App.Layout;
 
 public partial class MainLayout
 {
