@@ -9,6 +9,6 @@ internal class CreateProjectHandler(IProjectService projectService) : IRequestHa
 {
     public async Task<Project> Handle(CreateProjectRequest request, CancellationToken cancellationToken)
     {
-        return await projectService.CreateProject(request.Name);
+        return await projectService.CreateProject(request.Name, request.ShortName);
     }
 }

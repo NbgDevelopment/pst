@@ -11,11 +11,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         var tableClient = await GetTableClient();
 
         return tableClient.Query<ProjectEntity>()
-            .Select(p => new Project
-            {
-                Id = p.Id,
-                Name = p.Name
-            })
+            .Select(Map)
             .ToArray();
     }
 
@@ -25,30 +21,23 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
 
         var project = await tableClient.GetEntityAsync<ProjectEntity>(ProjectEntity.EntityPartitionKey, id.ToString());
 
-        return project.HasValue ? new Project
-        {
-            Id = project.Value.Id,
-            Name = project.Value.Name
-        } : null;
+        return project.HasValue ? Map(project.Value) : null;
     }
 
-    public async Task<Project> CreateProject(string name)
+    public async Task<Project> CreateProject(string name, string shortName)
     {
         var project = new ProjectEntity()
         {
             Id = Guid.NewGuid(),
-            Name = name
+            Name = name,
+            ShortName = shortName
         };
 
         var tableClient = await GetTableClient();
 
         await tableClient.AddEntityAsync(project);
 
-        return new Project
-        {
-            Id = project.Id,
-            Name = project.Name
-        };
+        return Map(project);
     }
 
     private async Task<TableClient> GetTableClient()
@@ -57,5 +46,15 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
 
         var tableClient = tableServiceClient.GetTableClient(table.Value.Name);
         return tableClient;
+    }
+
+    private static Project Map(ProjectEntity project)
+    {
+        return new Project
+        {
+            Id = project.Id,
+            Name = project.Name,
+            ShortName = project.ShortName
+        };
     }
 }

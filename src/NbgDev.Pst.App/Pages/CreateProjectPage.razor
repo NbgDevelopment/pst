@@ -6,6 +6,10 @@
     <MudCard>
         <MudCardContent>
             <MudTextField Label="Project name" @bind-Value="_project.Name" For="() => _project.Name" Required="true"></MudTextField>
+            <MudTextField Label="Short name" @bind-Value="_project.ShortName" For="() => _project.ShortName" Required="true"></MudTextField>
         </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary">Create</MudButton>
+        </MudCardActions>
     </MudCard>
 </EditForm>

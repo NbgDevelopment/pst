@@ -31,7 +31,11 @@ public class ProjectService(IProjectClient projectClient) : IProjectService
 
     public async Task<Project> CreateProject(ProjectToCreate project)
     {
-        var created = Map(await projectClient.CreateAsync(project.Name));
+        var created = Map(await projectClient.CreateAsync(new CreateProjectRequest
+        {
+            Name = project.Name,
+            ShortName = project.ShortName
+        }));
 
         ProjectCreated?.Invoke(created);
 
@@ -43,7 +47,8 @@ public class ProjectService(IProjectClient projectClient) : IProjectService
         return new()
         {
             Id = source.Id,
-            Name = source.Name
+            Name = source.Name,
+            ShortName = source.ShortName
         };
     }
 }

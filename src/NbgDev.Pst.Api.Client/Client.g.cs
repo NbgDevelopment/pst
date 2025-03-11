@@ -35,18 +35,18 @@ namespace NbgDev.Pst.Api.Client
         System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProjectDto>> GetAllAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="PstApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ProjectDto> CreateAsync(CreateProjectRequest request);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="PstApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<ProjectDto> CreateAsync(CreateProjectRequest request, System.Threading.CancellationToken cancellationToken);
+
+        /// <exception cref="PstApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ProjectDto> GetAsync(System.Guid id);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="PstApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<ProjectDto> GetAsync(System.Guid id, System.Threading.CancellationToken cancellationToken);
-
-        /// <exception cref="PstApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ProjectDto> CreateAsync(string name);
-
-        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <exception cref="PstApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<ProjectDto> CreateAsync(string name, System.Threading.CancellationToken cancellationToken);
 
     }
 
@@ -166,17 +166,17 @@ namespace NbgDev.Pst.Api.Client
         }
 
         /// <exception cref="PstApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ProjectDto> GetAsync(System.Guid id)
+        public virtual System.Threading.Tasks.Task<ProjectDto> CreateAsync(CreateProjectRequest request)
         {
-            return GetAsync(id, System.Threading.CancellationToken.None);
+            return CreateAsync(request, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="PstApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ProjectDto> GetAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ProjectDto> CreateAsync(CreateProjectRequest request, System.Threading.CancellationToken cancellationToken)
         {
-            if (id == null)
-                throw new System.ArgumentNullException("id");
+            if (request == null)
+                throw new System.ArgumentNullException("request");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -184,13 +184,17 @@ namespace NbgDev.Pst.Api.Client
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    request_.Method = new System.Net.Http.HttpMethod("GET");
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(request, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "{id}"
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
+                    // Operation Path: "api/Project"
+                    urlBuilder_.Append("api/Project");
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -245,17 +249,17 @@ namespace NbgDev.Pst.Api.Client
         }
 
         /// <exception cref="PstApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<ProjectDto> CreateAsync(string name)
+        public virtual System.Threading.Tasks.Task<ProjectDto> GetAsync(System.Guid id)
         {
-            return CreateAsync(name, System.Threading.CancellationToken.None);
+            return GetAsync(id, System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <exception cref="PstApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<ProjectDto> CreateAsync(string name, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<ProjectDto> GetAsync(System.Guid id, System.Threading.CancellationToken cancellationToken)
         {
-            if (name == null)
-                throw new System.ArgumentNullException("name");
+            if (id == null)
+                throw new System.ArgumentNullException("id");
 
             var client_ = _httpClient;
             var disposeClient_ = false;
@@ -263,14 +267,13 @@ namespace NbgDev.Pst.Api.Client
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    request_.Content = new System.Net.Http.StringContent(string.Empty, System.Text.Encoding.UTF8, "application/json");
-                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     var urlBuilder_ = new System.Text.StringBuilder();
                     if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
-                    // Operation Path: "{name}"
-                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(name, System.Globalization.CultureInfo.InvariantCulture)));
+                    // Operation Path: "{id}"
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
                     PrepareRequest(client_, request_, urlBuilder_);
 
@@ -678,6 +681,21 @@ namespace NbgDev.Pst.Api.Client
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("shortName")]
+        public string ShortName { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CreateProjectRequest
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("shortName")]
+        public string ShortName { get; set; } = default!;
 
     }
 

@@ -8,5 +8,5 @@ internal interface IProjectService
 
     Task<Project?> GetProject(Guid id);
 
-    Task<Project> CreateProject(string name);
+    Task<Project> CreateProject(string name, string shortName);
 }

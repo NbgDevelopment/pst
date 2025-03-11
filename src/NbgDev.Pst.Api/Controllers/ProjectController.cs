@@ -15,11 +15,7 @@ public class ProjectController(IMediator mediator) : ControllerBase
     {
         var projects = await mediator.Send(new GetProjectsRequest());
         return projects
-            .Select(p => new ProjectDto
-            {
-                Id = p.Id,
-                Name = p.Name
-            })
+            .Select(Map)
             .ToArray();
     }
 
@@ -33,22 +29,34 @@ public class ProjectController(IMediator mediator) : ControllerBase
             return NotFound();
         }
 
-        return Ok(new ProjectDto
-        {
-            Id = project.Id,
-            Name = project.Name
-        });
+        return Ok(Map(project));
     }
 
-    [HttpPut("/{name}")]
-    public async Task<ProjectDto> Create(string name)
+    [HttpPut]
+    public async Task<ActionResult<ProjectDto>> Create([FromBody]CreateProjectRequest request)
     {
-        var project = await mediator.Send(new CreateProjectRequest(name));
+        if (string.IsNullOrWhiteSpace(request.Name))
+        {
+            return ValidationProblem("Project name may not be null or empty");
+        }
 
+        if (string.IsNullOrWhiteSpace(request.ShortName))
+        {
+            return ValidationProblem("Project short name may not be null or empty");
+        }
+
+        var project = await mediator.Send(request);
+
+        return Ok(Map(project));
+    }
+
+    private static ProjectDto Map(Project project)
+    {
         return new ProjectDto
         {
             Id = project.Id,
-            Name = project.Name
+            Name = project.Name,
+            ShortName = project.ShortName
         };
     }
 }
