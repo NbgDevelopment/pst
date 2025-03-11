@@ -1,20 +1,54 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using NbgDev.Pst.Api.Dtos;
+using NbgDev.Pst.Projects.Contract.Models;
+using NbgDev.Pst.Projects.Contract.Requests;
 
 namespace NbgDev.Pst.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ProjectController : ControllerBase
+public class ProjectController(IMediator mediator) : ControllerBase
 {
-    private readonly List<ProjectDto> _projects = [
-        new ProjectDto{ Id = Guid.Parse("9a522978-7615-452d-af57-aad52aa36f36"), Name = "Project 1" },
-        new ProjectDto{ Id = Guid.Parse("00661810-a3bc-456c-bc89-18abfe540de2"), Name = "Project 2" }
-    ];
-
     [HttpGet]
-    public IReadOnlyList<ProjectDto> Get()
+    public async Task<IReadOnlyList<ProjectDto>> Get()
     {
-        return _projects;
+        var projects = await mediator.Send(new GetProjectsRequest());
+        return projects
+            .Select(p => new ProjectDto
+            {
+                Id = p.Id,
+                Name = p.Name
+            })
+            .ToArray();
+    }
+
+    [HttpGet("/{id}")]
+    public async Task<ActionResult<ProjectDto>> Get(Guid id)
+    {
+        var project = await mediator.Send(new GetProjectRequest(id));
+
+        if (project is null)
+        {
+            return NotFound();
+        }
+
+        return Ok(new ProjectDto
+        {
+            Id = project.Id,
+            Name = project.Name
+        });
+    }
+
+    [HttpPut("/{name}")]
+    public async Task<ProjectDto> Create(string name)
+    {
+        var project = await mediator.Send(new CreateProjectRequest(name));
+
+        return new ProjectDto
+        {
+            Id = project.Id,
+            Name = project.Name
+        };
     }
 }

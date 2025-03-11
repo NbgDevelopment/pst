@@ -1,0 +1,11 @@
+@page "/project/create"
+
+<h3>Create Project</h3>
+
+<EditForm Model="_project" OnValidSubmit="OnValidSubmit">
+    <MudCard>
+        <MudCardContent>
+            <MudTextField Label="Project name" @bind-Value="_project.Name" For="() => _project.Name" Required="true"></MudTextField>
+        </MudCardContent>
+    </MudCard>
+</EditForm>

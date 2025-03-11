@@ -6,7 +6,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "dotnetRunMessages": true,
-      "launchUrl": "https://localhost:7236/openapi/v1.json",
+      "launchUrl": "https://localhost:7236/swagger/v1/swagger.json",
       "applicationUrl": "https://localhost:7236"
     },
     "Container (Dockerfile)": {

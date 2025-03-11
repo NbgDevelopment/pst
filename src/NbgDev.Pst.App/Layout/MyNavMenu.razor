@@ -3,11 +3,12 @@
     <AuthorizeView>
         <Authorized>
             <MudNavGroup Title="Projects" Expanded="true">
-                @foreach (var project in Projects)
+                @foreach (var project in Projects.OrderBy(p => p.Name))
                 {
                     var href = $"/project/{project.Id}";
                     <MudNavLink Href="@href" Match="NavLinkMatch.Prefix">@project.Name</MudNavLink>
                 }
+                <MudNavLink Href="/project/create" Match="NavLinkMatch.All">Create</MudNavLink>
             </MudNavGroup>
         </Authorized>
     </AuthorizeView>

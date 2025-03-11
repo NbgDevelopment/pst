@@ -12,6 +12,7 @@ public partial class MyNavMenu : IDisposable
     public MyNavMenu(IProjectService projectService, AuthenticationStateProvider authenticationStateProvider)
     {
         _projectService = projectService;
+        _projectService.ProjectCreated += OnProjectCreated;
         _authenticationStateProvider = authenticationStateProvider;
         _authenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
     }
@@ -22,7 +23,7 @@ public partial class MyNavMenu : IDisposable
         await LoadProjects(authenticationState.User.Identity?.IsAuthenticated == true);
     }
 
-    private IReadOnlyList<Project> Projects { get; set; } = [];
+    private List<Project> Projects { get; set; } = [];
 
     protected override async Task OnParametersSetAsync()
     {
@@ -32,13 +33,23 @@ public partial class MyNavMenu : IDisposable
 
     private async Task LoadProjects(bool isAuthenticated)
     {
-        Projects = isAuthenticated
-            ? await _projectService.GetProjects()
-            : [];
+        Projects.Clear();
+
+        if (isAuthenticated)
+        {
+            Projects.AddRange(await _projectService.GetProjects());
+        }
+    }
+
+    private void OnProjectCreated(Project project)
+    {
+        Projects.Add(project);
+        StateHasChanged();
     }
 
     public void Dispose()
     {
+        _projectService.ProjectCreated -= OnProjectCreated;
         _authenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
     }
 }
