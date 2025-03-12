@@ -51,7 +51,7 @@ namespace NbgDev.Pst.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    internal partial class ProjectClient : IProjectClient
+    internal partial class ProjectClient : PstApiClient, IProjectClient
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -85,10 +85,6 @@ namespace NbgDev.Pst.Api.Client
 
         partial void Initialize();
 
-        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
-        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
-        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
-
         /// <exception cref="PstApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<ProjectDto>> GetAllAsync()
         {
@@ -113,12 +109,12 @@ namespace NbgDev.Pst.Api.Client
                     // Operation Path: "api/Project"
                     urlBuilder_.Append("api/Project");
 
-                    PrepareRequest(client_, request_, urlBuilder_);
+                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    PrepareRequest(client_, request_, url_);
+                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -133,7 +129,7 @@ namespace NbgDev.Pst.Api.Client
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        ProcessResponse(client_, response_);
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -196,12 +192,12 @@ namespace NbgDev.Pst.Api.Client
                     // Operation Path: "api/Project"
                     urlBuilder_.Append("api/Project");
 
-                    PrepareRequest(client_, request_, urlBuilder_);
+                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    PrepareRequest(client_, request_, url_);
+                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -216,7 +212,7 @@ namespace NbgDev.Pst.Api.Client
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        ProcessResponse(client_, response_);
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -275,12 +271,12 @@ namespace NbgDev.Pst.Api.Client
                     // Operation Path: "{id}"
                     urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(id, System.Globalization.CultureInfo.InvariantCulture)));
 
-                    PrepareRequest(client_, request_, urlBuilder_);
+                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    PrepareRequest(client_, request_, url_);
+                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -295,7 +291,7 @@ namespace NbgDev.Pst.Api.Client
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        ProcessResponse(client_, response_);
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)
@@ -449,7 +445,7 @@ namespace NbgDev.Pst.Api.Client
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NSwag", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
-    internal partial class WeatherForecastClient : IWeatherForecastClient
+    internal partial class WeatherForecastClient : PstApiClient, IWeatherForecastClient
     {
         #pragma warning disable 8618
         private string _baseUrl;
@@ -483,10 +479,6 @@ namespace NbgDev.Pst.Api.Client
 
         partial void Initialize();
 
-        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, string url);
-        partial void PrepareRequest(System.Net.Http.HttpClient client, System.Net.Http.HttpRequestMessage request, System.Text.StringBuilder urlBuilder);
-        partial void ProcessResponse(System.Net.Http.HttpClient client, System.Net.Http.HttpResponseMessage response);
-
         /// <exception cref="PstApiException">A server side error occurred.</exception>
         public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<WeatherForecast>> GetAsync()
         {
@@ -511,12 +503,12 @@ namespace NbgDev.Pst.Api.Client
                     // Operation Path: "WeatherForecast"
                     urlBuilder_.Append("WeatherForecast");
 
-                    PrepareRequest(client_, request_, urlBuilder_);
+                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
 
                     var url_ = urlBuilder_.ToString();
                     request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
 
-                    PrepareRequest(client_, request_, url_);
+                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
 
                     var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
                     var disposeResponse_ = true;
@@ -531,7 +523,7 @@ namespace NbgDev.Pst.Api.Client
                                 headers_[item_.Key] = item_.Value;
                         }
 
-                        ProcessResponse(client_, response_);
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
 
                         var status_ = (int)response_.StatusCode;
                         if (status_ == 200)

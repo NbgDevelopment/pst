@@ -20,7 +20,7 @@
   },
   "codeGenerators": {
     "openApiToCSharpClient": {
-      "clientBaseClass": null,
+      "clientBaseClass": "PstApiClient",
       "configurationClass": null,
       "generateClientClasses": true,
       "suppressClientClassesOutput": false,
@@ -39,7 +39,7 @@
       "useBaseUrl": true,
       "generateBaseUrlProperty": false,
       "generateSyncMethods": false,
-      "generatePrepareRequestAndProcessResponseAsAsyncMethods": false,
+      "generatePrepareRequestAndProcessResponseAsAsyncMethods": true,
       "exposeJsonSerializerSettings": false,
       "clientClassAccessModifier": "internal",
       "typeAccessModifier": "public",

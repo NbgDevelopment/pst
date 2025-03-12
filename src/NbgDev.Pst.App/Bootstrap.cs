@@ -14,7 +14,7 @@ public static class Bootstrap
 
         services.AddPstApiClient(configuration);
 
-        services.AddSingleton<IProjectService, ProjectService>();
+        services.AddScoped<IProjectService, ProjectService>();
 
         return services;
     }

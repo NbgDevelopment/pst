@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Identity.Web;
 using NbgDev.Pst.Projects.AzureTable;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -5,8 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddServiceDefaults();
 
 // Add services to the container.
-//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
 
 builder.Services.AddMediatR(config =>
 {
@@ -22,7 +24,7 @@ builder.Services.AddCors(cors =>
     cors.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithHeaders("content-type");
+            policy.WithHeaders("content-type", "authorization");
             policy.AllowAnyMethod();
             policy.WithOrigins(builder.Configuration["Cors:AllowedOrigins"]!);
         });
@@ -42,9 +44,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-//app.UseAuthorization();
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllers().RequireAuthorization();
 
 app.UseCors("AllowFrontend");
 
