@@ -1,4 +1,4 @@
-name: Docker Image CD
+name: Project Setup Tool CD
 
 on:
   workflow_dispatch:

@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Project Setup Tool CI
 
 on:
   push:
