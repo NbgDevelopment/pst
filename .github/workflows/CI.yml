@@ -3,6 +3,9 @@ name: Project Setup Tool CI
 on:
   push:
     branches: [ "main" ]
+    paths: 
+      - "src/**"
+      - ".github/workflows/CI.yml"
   pull_request:
     branches: [ "main" ]
   workflow_dispatch:
