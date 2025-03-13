@@ -69,8 +69,8 @@ jobs:
         context: ./src
         file: ./src/NbgDev.Pst.Web/Dockerfile
         push: true
-        tags: ${{ steps.metaApi.outputs.tags }}
-        labels: ${{ steps.metaApi.outputs.labels }}
+        tags: ${{ steps.metaWeb.outputs.tags }}
+        labels: ${{ steps.metaWeb.outputs.labels }}
 
     - name: Output image tag
       run: echo "Image tag ${{ steps.imageTag.outputs.tag }} published" >> $GITHUB_STEP_SUMMARY
