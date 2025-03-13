@@ -1,0 +1,26 @@
+name: Project Setup Tool CI
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: 
+      - "src/**"
+      - ".github/workflows/CI.yml"
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build the API Docker image
+      run: docker build ./src --file ./src/NbgDev.Pst.Api/Dockerfile --tag pst-api:$(date +%s)
+
+    - name: Build the Web Docker image
+      run: docker build ./src --file ./src/NbgDev.Pst.Web/Dockerfile --tag pst-web:$(date +%s)
