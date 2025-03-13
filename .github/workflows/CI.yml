@@ -18,3 +18,6 @@ jobs:
 
     - name: Build the API Docker image
       run: docker build ./src --file ./src/NbgDev.Pst.Api/Dockerfile --tag pst-api:$(date +%s)
+
+    - name: Build the Web Docker image
+      run: docker build ./src --file ./src/NbgDev.Pst.Web/Dockerfile --tag pst-web:$(date +%s)
