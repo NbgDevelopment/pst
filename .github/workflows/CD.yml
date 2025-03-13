@@ -1,7 +1,10 @@
-name: Docker Image CI
+name: Docker Image CD
 
 on:
   workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
 
 jobs:
 
