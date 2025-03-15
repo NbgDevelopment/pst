@@ -402,3 +402,4 @@ FodyWeavers.xsd
 # Terraform
 /src/.azure/.terraform*
 /src/.azure/stages/debug*
+/src/NbgDev.Pst.Web/wwwroot/appsettings.debug.json
