@@ -18,6 +18,28 @@ variable "resource_group_name" {
   type = string
 }
 
-variable "workspace_id" {
+variable "container_app_environment_id" {
   type = string
+}
+
+variable "registry_username" {
+  type = string
+}
+
+variable "registry_password" {
+  type = string
+  sensitive = true
+}
+
+variable "image" {
+  type = string
+}
+
+variable "app_insights_instrumentation_key" {
+  type = string
+}
+
+variable "connectionstring_projects" {
+  type      = string
+  sensitive = true
 }

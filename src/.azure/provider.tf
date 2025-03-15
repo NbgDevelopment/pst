@@ -8,9 +8,9 @@ terraform {
   }
 
   backend "azurerm" {
-    resource_group_name = "rg-pst-management"
+    resource_group_name  = "rg-pst-management"
     storage_account_name = "stpstmanagement"
-    container_name = "terraform-states"
+    container_name       = "terraform-states"
   }
 
   required_version = ">= 1.11.2"
