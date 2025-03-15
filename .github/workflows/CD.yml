@@ -90,6 +90,7 @@ jobs:
 
     - name: Terraform Init
       run: terraform init -backend-config key="${{ vars.STAGE }}.tfstate" -backend-config sas_token="${{ secrets.SAS_TOKEN_STATES }}"
+      working-directory: ./src/.azure
 
     - name: Terraform Apply
       run: terraform apply `
