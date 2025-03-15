@@ -41,3 +41,15 @@ module "api" {
   registry_username                = var.registry_username
   registry_password                = var.registry_password
 }
+
+module "web" {
+  source                           = "./resources/web"
+  stage                            = var.stage
+  location                         = azurerm_resource_group.rg.location
+  resource_group_name              = azurerm_resource_group.rg.name
+  tags                             = local.tags
+  container_app_environment_id     = module.container-environment.container_app_environment_id
+  image                            = var.image_web
+  registry_username                = var.registry_username
+  registry_password                = var.registry_password
+}

@@ -1,5 +1,5 @@
 resource "azurerm_container_app" "api" {
-  name                         = "aca-pst-${var.stage}-api"
+  name                         = "aca-pst-${var.stage}-web"
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = var.resource_group_name
   tags                         = var.tags
@@ -7,27 +7,19 @@ resource "azurerm_container_app" "api" {
 
   template {
     min_replicas = 0
-    max_replicas = 2
+    max_replicas = 1
     http_scale_rule {
       name                = "http-scale-rule"
       concurrent_requests = 100
     }
     container {
-      name   = "pst-api"
+      name   = "pst-web"
       image  = var.image
       cpu    = 0.25
       memory = "0.5Gi"
       env {
-        name  = "APPINSIGHTS_INSTRUMENTATIONKEY"
-        value = var.app_insights_instrumentation_key
-      }
-      env {
-        name  = "ConnectionStrings__Projects"
-        secret_name = "connectionstring-projects"
-      }
-      env {
-        name  = "ASPNETCORE_ENVIRONMENT"
-        value = var.stage == "dev" ? "Development" : var.stage == "debug" ? "Development" : "Production"
+        name  = "stage"
+        value = var.stage
       }
     }
   }
@@ -37,11 +29,6 @@ resource "azurerm_container_app" "api" {
     value = var.registry_password
   }
 
-  secret {
-    name = "connectionstring-projects"
-    value = var.connectionstring_projects
-  }
-
   registry {
     server   = "ghcr.io"
     username = var.registry_username
@@ -49,7 +36,7 @@ resource "azurerm_container_app" "api" {
   }
 
   ingress {
-    target_port      = 8080
+    target_port      = 80
     external_enabled = true
     transport        = "http"
     traffic_weight {

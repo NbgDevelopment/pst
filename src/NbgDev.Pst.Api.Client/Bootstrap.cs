@@ -14,6 +14,7 @@ public static class Bootstrap
         services.AddScoped<IProjectClient>(serviceProvider =>
         {
             var options = serviceProvider.GetRequiredService<IOptions<PstApiClientOptions>>();
+            Console.WriteLine($"API Url: {options.Value.ApiUrl}");
             var accessTokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
             return new ProjectClient(options.Value.ApiUrl, new HttpClient())
             {

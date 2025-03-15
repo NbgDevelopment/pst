@@ -4,6 +4,19 @@ using NbgDev.Pst.App;
 using NbgDev.Pst.Web;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+Console.WriteLine($"BaseUrl: {builder.HostEnvironment.BaseAddress}");
+
+using (var client = new HttpClient{ BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) })
+{
+    using var response = await client.GetAsync("appsettings.backend.json");
+    if (response.IsSuccessStatusCode)
+    {
+        await using var stream = await response.Content.ReadAsStreamAsync();
+        builder.Configuration.AddJsonStream(stream);
+    }
+}
+
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
@@ -15,7 +28,13 @@ builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
     var scope = builder.Configuration["PstApi:Scope"];
-    Console.Error.WriteLine("Configuration for [PstApi:Scope] not found.");
+
+    if (string.IsNullOrWhiteSpace(scope))
+    {
+        Console.Error.WriteLine("Configuration for [PstApi:Scope] not found.");
+        return;
+    }
+
     options.ProviderOptions.DefaultAccessTokenScopes.Add(scope);
 });
 
