@@ -95,14 +95,14 @@ jobs:
       working-directory: ./src/.azure
 
     - name: Terraform Apply
-      run: |
-        terraform apply `
+      run: >
+        terraform apply 
         -var 'stage=dev'
-        -var 'subscription_id=${{ vars.SUBSCRIPTION_ID }}' `
-        -var 'image_api=${{ env.REGISTRY }}/nbgdevelopment/pst-api:${{ needs.build.outputs.imageTag }}' `
-        -var 'image_web=${{ env.REGISTRY }}/nbgdevelopment/pst-web:${{ needs.build.outputs.imageTag }}' `
-        -var 'registry_username=${{ vars.REGISTRY_USERNAME }}' `
-        -var 'registry_password=${{ secrets.REGISTRY_PASSWORD }}' `
+        -var 'subscription_id=${{ vars.SUBSCRIPTION_ID }}'
+        -var 'image_api=${{ env.REGISTRY }}/nbgdevelopment/pst-api:${{ needs.build.outputs.imageTag }}'
+        -var 'image_web=${{ env.REGISTRY }}/nbgdevelopment/pst-web:${{ needs.build.outputs.imageTag }}'
+        -var 'registry_username=${{ vars.REGISTRY_USERNAME }}'
+        -var 'registry_password=${{ secrets.REGISTRY_PASSWORD }}'
         -auto-approve
       working-directory: ./src/.azure
       env:
