@@ -95,7 +95,8 @@ jobs:
       working-directory: ./src/.azure
 
     - name: Terraform Apply
-      run: terraform apply `
+      run: |
+        terraform apply `
         -var 'stage=dev'
         -var 'subscription_id=${{ vars.SUBSCRIPTION_ID }}' `
         -var 'image_api=${{ env.REGISTRY }}/nbgdevelopment/pst-api:${{ needs.build.outputs.imageTag }}' `
