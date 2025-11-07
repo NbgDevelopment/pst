@@ -17,4 +17,10 @@ FROM nginx:alpine AS final
 WORKDIR /var/www/web
 COPY --from=publish /app/publish/wwwroot .
 COPY NbgDev.Pst.Web/nginx.conf /etc/nginx/nginx.conf
+
+COPY ["NbgDev.Pst.Web/run-nginx.sh", "/usr/share/nginx/run-nginx.sh"]
+RUN chmod +x /usr/share/nginx/run-nginx.sh
+
 EXPOSE 80
+
+CMD ["/usr/share/nginx/run-nginx.sh"]

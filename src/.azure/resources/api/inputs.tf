@@ -1,13 +1,25 @@
-variable "subscription_id" {
-  type = string
-}
-
 variable "stage" {
   type = string
   validation {
     condition     = length(var.stage) >= 3 && length(var.stage) <= 5
     error_message = "The length of the stage parameter must be between 3 and 5 characters"
   }
+}
+
+variable "tags" {
+  type = map(string)
+}
+
+variable "location" {
+  type = string
+}
+
+variable "resource_group_name" {
+  type = string
+}
+
+variable "container_app_environment_id" {
+  type = string
 }
 
 variable "registry_username" {
@@ -19,10 +31,15 @@ variable "registry_password" {
   sensitive = true
 }
 
-variable "image_api" {
+variable "image" {
   type = string
 }
 
-variable "image_web" {
+variable "app_insights_instrumentation_key" {
   type = string
+}
+
+variable "connectionstring_projects" {
+  type      = string
+  sensitive = true
 }

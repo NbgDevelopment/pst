@@ -1,6 +1,6 @@
 locals {
   tags = {
     Product = "PST"
-    Stage = var.stage
+    Stage   = var.stage
   }
 }

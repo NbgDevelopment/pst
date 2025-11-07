@@ -1,7 +1,3 @@
-variable "subscription_id" {
-  type = string
-}
-
 variable "stage" {
   type = string
   validation {
@@ -10,19 +6,14 @@ variable "stage" {
   }
 }
 
-variable "registry_username" {
+variable "tags" {
+  type = map(string)
+}
+
+variable "location" {
   type = string
 }
 
-variable "registry_password" {
-  type = string
-  sensitive = true
-}
-
-variable "image_api" {
-  type = string
-}
-
-variable "image_web" {
+variable "resource_group_name" {
   type = string
 }

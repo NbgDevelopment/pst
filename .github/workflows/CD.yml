@@ -9,6 +9,8 @@ env:
 jobs:
 
   build:
+    outputs:
+      imageTag: ${{ steps.imageTag.outputs.tag }}
 
     runs-on: ubuntu-latest
 
@@ -74,3 +76,37 @@ jobs:
 
     - name: Output image tag
       run: echo "Image tag ${{ steps.imageTag.outputs.tag }} published" >> $GITHUB_STEP_SUMMARY
+
+  deploy-dev:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    environment: dev
+
+    steps:
+    - uses: actions/checkout@v4
+  
+    - name: Set up Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Terraform Init
+      run: terraform init -backend-config key="${{ vars.STAGE }}.tfstate" -backend-config sas_token="${{ secrets.SAS_TOKEN_STATES }}"
+      working-directory: ./src/.azure
+
+    - name: Terraform Apply
+      run: >
+        terraform apply 
+        -var 'stage=dev'
+        -var 'subscription_id=${{ vars.SUBSCRIPTION_ID }}'
+        -var 'image_api=${{ env.REGISTRY }}/nbgdevelopment/pst-api:${{ needs.build.outputs.imageTag }}'
+        -var 'image_web=${{ env.REGISTRY }}/nbgdevelopment/pst-web:${{ needs.build.outputs.imageTag }}'
+        -var 'registry_username=${{ vars.REGISTRY_USERNAME }}'
+        -var 'registry_password=${{ secrets.REGISTRY_PASSWORD }}'
+        -auto-approve
+      working-directory: ./src/.azure
+      env:
+        ARM_CLIENT_ID: ${{ vars.DEPLOYMENT_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
+        ARM_SUBSCRIPTION_ID: "${{ vars.SUBSCRIPTION_ID }}"
+        ARM_TENANT_ID: ${{ vars.DEPLOYMENT_TENANT_ID }}
