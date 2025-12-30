@@ -36,6 +36,9 @@ builder.Services.AddMsalAuthentication(options =>
     }
 
     options.ProviderOptions.DefaultAccessTokenScopes.Add(scope);
+    
+    // Configure MSAL to use localStorage for persistent login across browser restarts
+    options.ProviderOptions.Cache.CacheLocation = "localStorage";
 });
 
 await builder.Build().RunAsync();
