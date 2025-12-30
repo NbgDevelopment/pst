@@ -298,7 +298,7 @@ az storage account generate-sas \
 $STORAGE_ACCOUNT = "stpstmanagement"
 
 # Calculate expiry date (1 year from now)
-$EXPIRY_DATE = (Get-Date).AddYears(1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+$EXPIRY_DATE = (Get-Date).AddYears(1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss") + "Z"
 
 # Or specify the date manually:
 # $EXPIRY_DATE = "2026-12-30T23:59:59Z"
