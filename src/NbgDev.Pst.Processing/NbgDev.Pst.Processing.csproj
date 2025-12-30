@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Azure.Storage.Queues" Version="9.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NbgDev.Pst\NbgDev.Pst.ServiceDefaults\NbgDev.Pst.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\NbgDev.Pst.Events.Contract\NbgDev.Pst.Events.Contract.csproj" />
+  </ItemGroup>
+
+</Project>

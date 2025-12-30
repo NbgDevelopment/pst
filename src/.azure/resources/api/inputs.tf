@@ -43,3 +43,8 @@ variable "connectionstring_projects" {
   type      = string
   sensitive = true
 }
+
+variable "connectionstring_queues" {
+  type      = string
+  sensitive = true
+}

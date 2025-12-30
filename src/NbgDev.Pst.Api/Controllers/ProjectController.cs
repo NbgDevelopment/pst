@@ -1,6 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NbgDev.Pst.Api.Dtos;
+using NbgDev.Pst.Api.Services;
+using NbgDev.Pst.Events.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Requests;
 
@@ -8,7 +10,7 @@ namespace NbgDev.Pst.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ProjectController(IMediator mediator) : ControllerBase
+public class ProjectController(IMediator mediator, IEventPublisher eventPublisher) : ControllerBase
 {
     [HttpGet]
     public async Task<IReadOnlyList<ProjectDto>> Get()
@@ -46,6 +48,14 @@ public class ProjectController(IMediator mediator) : ControllerBase
         }
 
         var project = await mediator.Send(request);
+
+        await eventPublisher.PublishAsync(new ProjectCreatedEvent
+        {
+            EventType = nameof(ProjectCreatedEvent),
+            ProjectId = project.Id,
+            ProjectName = project.Name,
+            ShortName = project.ShortName
+        });
 
         return Ok(Map(project));
     }

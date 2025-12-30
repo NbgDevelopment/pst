@@ -6,3 +6,13 @@ resource "azurerm_storage_account" "storage" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
+
+resource "azurerm_storage_queue" "api_events" {
+  name                 = "api-events"
+  storage_account_name = azurerm_storage_account.storage.name
+}
+
+resource "azurerm_storage_queue" "processing_events" {
+  name                 = "processing-events"
+  storage_account_name = azurerm_storage_account.storage.name
+}
