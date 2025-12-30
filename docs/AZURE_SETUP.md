@@ -176,7 +176,15 @@ Create a SAS token with appropriate permissions and expiration:
 ```bash
 # Set variables
 STORAGE_ACCOUNT="stpstmanagement"
-EXPIRY_DATE=$(date -u -d "+1 year" '+%Y-%m-%dT%H:%M:%SZ')  # Expires in 1 year
+
+# For Linux/GNU systems:
+EXPIRY_DATE=$(date -u -d "+1 year" '+%Y-%m-%dT%H:%M:%SZ')
+
+# For macOS/BSD systems, use:
+# EXPIRY_DATE=$(date -u -v+1y '+%Y-%m-%dT%H:%M:%SZ')
+
+# Or specify the date manually (recommended for cross-platform compatibility):
+# EXPIRY_DATE="2026-12-30T23:59:59Z"
 
 # Generate SAS token
 az storage account generate-sas \
