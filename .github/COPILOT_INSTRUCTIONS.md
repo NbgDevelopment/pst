@@ -247,12 +247,12 @@ The project uses Terraform to manage Azure infrastructure as code. All Terraform
    - **Processing**: Internal ingress on port 8080, scales 1-2 replicas
 
 ### Container Apps Scaling
-- **All container apps scale down to 0 replicas when idle** (except Processing which has min_replicas=1)
+- **API and Web container apps scale down to 0 replicas when idle**
 - API and Web apps use HTTP scale rules (100 concurrent requests threshold)
 - This provides cost efficiency by only consuming resources under load
 - API: `min_replicas = 0`, `max_replicas = 2`
 - Web: `min_replicas = 0`, `max_replicas = 1`
-- Processing: `min_replicas = 1`, `max_replicas = 2` (background service, needs to be always running)
+- Processing: `min_replicas = 1`, `max_replicas = 2` (background service, always running to process queue messages)
 
 ### Deployment Process
 1. CD workflow builds and publishes Docker images
