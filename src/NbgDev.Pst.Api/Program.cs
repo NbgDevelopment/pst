@@ -32,9 +32,10 @@ builder.Services.AddCors(cors =>
     cors.AddPolicy("AllowFrontend",
         policy =>
         {
-            policy.WithHeaders("content-type", "authorization");
+            policy.AllowAnyHeader();
             policy.AllowAnyMethod();
-            policy.WithOrigins(builder.Configuration["Cors:AllowedOrigins"]!);
+            policy.AllowCredentials();
+            policy.WithOrigins(builder.Configuration["Cors:AllowedOrigins"]!.Split(',', StringSplitOptions.RemoveEmptyEntries));
         });
 });
 
@@ -53,8 +54,8 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllers().RequireAuthorization();
-
 app.UseCors("AllowFrontend");
+
+app.MapControllers().RequireAuthorization();
 
 app.Run();
