@@ -26,9 +26,15 @@ template {
 
 ## Deployment
 
-To deploy the infrastructure:
+### Local Deployment (Debug)
+
+To deploy the infrastructure locally:
 
 1. Navigate to this directory
-2. Run the appropriate deployment script (e.g., `Deploy-Debug.ps1`)
+2. Run `Deploy-Debug.ps1`
 3. Review the Terraform plan
 4. Confirm deployment when prompted
+
+### Production Deployment
+
+Production deployments are handled via GitHub Actions (see `.github/workflows/CD.yml`).
