@@ -34,3 +34,12 @@ variable "registry_password" {
 variable "image" {
   type = string
 }
+
+variable "api_url" {
+  type = string
+  description = "The URL of the API endpoint"
+  validation {
+    condition = can(regex("^https?://", var.api_url))
+    error_message = "API URL must be a valid HTTP/HTTPS URL."
+  }
+}
