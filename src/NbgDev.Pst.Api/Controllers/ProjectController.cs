@@ -49,8 +49,9 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
 
         var project = await mediator.Send(request);
 
-        await eventPublisher.PublishProjectCreatedAsync(new ProjectCreatedEvent
+        await eventPublisher.PublishAsync(new ProjectCreatedEvent
         {
+            EventType = nameof(ProjectCreatedEvent),
             ProjectId = project.Id,
             ProjectName = project.Name,
             ShortName = project.ShortName

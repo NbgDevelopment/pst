@@ -1,9 +1,8 @@
 using Azure.Storage.Queues;
 using NbgDev.Pst.Events.Contract.Base;
-using NbgDev.Pst.Events.Contract.Models;
 using System.Text.Json;
 
-namespace NbgDev.Pst.Api.Services;
+namespace NbgDev.Pst.Processing.Services;
 
 public interface IEventPublisher
 {
@@ -12,7 +11,7 @@ public interface IEventPublisher
 
 public class EventPublisher(QueueServiceClient queueServiceClient, ILogger<EventPublisher> logger) : IEventPublisher
 {
-    private const string QueueName = "api-events";
+    private const string QueueName = "processing-events";
 
     public async Task PublishAsync(BaseEvent @event, CancellationToken cancellationToken = default)
     {
