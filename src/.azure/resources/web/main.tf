@@ -1,4 +1,4 @@
-resource "azurerm_container_app" "api" {
+resource "azurerm_container_app" "web" {
   name                         = "aca-pst-${var.stage}-web"
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = var.resource_group_name
