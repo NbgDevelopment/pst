@@ -34,3 +34,8 @@ variable "registry_password" {
 variable "image" {
   type = string
 }
+
+variable "api_url" {
+  type = string
+  description = "The URL of the API endpoint"
+}

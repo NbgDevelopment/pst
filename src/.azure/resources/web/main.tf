@@ -21,6 +21,10 @@ resource "azurerm_container_app" "api" {
         name  = "stage"
         value = var.stage
       }
+      env {
+        name  = "API_URL"
+        value = var.api_url
+      }
     }
   }
 

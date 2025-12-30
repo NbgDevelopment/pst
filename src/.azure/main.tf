@@ -67,4 +67,5 @@ module "web" {
   image                        = var.image_web
   registry_username            = var.registry_username
   registry_password            = var.registry_password
+  api_url                      = module.api.api_fqdn
 }
