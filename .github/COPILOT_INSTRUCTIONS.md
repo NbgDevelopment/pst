@@ -195,6 +195,77 @@ public static class BootstrapProjectsAzureTable
 3. **Docker**: Use the provided `Dockerfile` for containerization
 4. **OpenAPI**: Available in development mode for API exploration (NSwag)
 
+## GitHub Actions Workflows
+
+### CI Workflow (CI.yml)
+- **Triggers**: On push to `src/**` or `.github/workflows/CI.yml`, on pull requests, or manual dispatch
+- **Purpose**: Continuous integration - builds Docker images for validation
+- **Jobs**:
+  - Builds the API Docker image (`pst-api`)
+  - Builds the Web Docker image (`pst-web`)
+- **Location**: `.github/workflows/CI.yml`
+
+### CD Workflow (CD.yml)
+- **Triggers**: Manual dispatch only (workflow_dispatch)
+- **Purpose**: Continuous deployment - builds, publishes, and deploys to Azure
+- **Jobs**:
+  1. **Build Job**:
+     - Logs into GitHub Container Registry (ghcr.io)
+     - Creates image tags based on branch name and run number
+     - Builds and pushes API Docker image to `ghcr.io/nbgdevelopment/pst-api`
+     - Builds and pushes Web Docker image to `ghcr.io/nbgdevelopment/pst-web`
+  2. **Deploy-Dev Job**:
+     - Sets up Terraform
+     - Initializes Terraform with backend configuration
+     - Applies Terraform configuration to deploy to Azure Container Apps
+     - Uses GitHub secrets and variables for Azure authentication
+- **Location**: `.github/workflows/CD.yml`
+
+## Terraform Infrastructure
+
+### Overview
+The project uses Terraform to manage Azure infrastructure as code. All Terraform files are located in `src/.azure`.
+
+### Structure
+- **Main Configuration** (`main.tf`): Orchestrates all resources
+- **Modular Resources**: Each component has its own module in `resources/` directory
+  - `monitoring/`: Application Insights and Log Analytics workspace
+  - `storage/`: Azure Table Storage and Queue Storage
+  - `container-environment/`: Azure Container Apps environment
+  - `api/`: API container app
+  - `web/`: Web container app
+  - `processing/`: Background processing container app
+
+### Key Resources
+1. **Resource Group**: `rg-pst-{stage}` in Germany West Central region
+2. **Monitoring**: Application Insights for telemetry and logging
+3. **Storage**: Azure Table Storage (for projects data) and Azure Queue Storage (for events)
+4. **Container Apps Environment**: Shared environment for all container apps
+5. **Container Apps**:
+   - **API**: External ingress on port 8080, scales 0-2 replicas
+   - **Web**: External ingress on port 80, scales 0-1 replicas
+   - **Processing**: Internal ingress on port 8080, scales 1-2 replicas
+
+### Container Apps Scaling
+- **All container apps scale down to 0 replicas when idle** (except Processing which has min_replicas=1)
+- API and Web apps use HTTP scale rules (100 concurrent requests threshold)
+- This provides cost efficiency by only consuming resources under load
+- API: `min_replicas = 0`, `max_replicas = 2`
+- Web: `min_replicas = 0`, `max_replicas = 1`
+- Processing: `min_replicas = 1`, `max_replicas = 2` (background service, needs to be always running)
+
+### Deployment Process
+1. CD workflow builds and publishes Docker images
+2. Terraform applies infrastructure changes with new image tags
+3. Container Apps pull images from GitHub Container Registry (ghcr.io)
+4. Environment-specific configuration via variables (dev, prod)
+
+### Important Notes
+- Container registry credentials are stored in GitHub secrets
+- Azure credentials use Service Principal authentication
+- Connection strings for storage are injected as container app secrets
+- Environment variables set based on stage (Development for dev/debug, Production otherwise)
+
 ## Comments
 
 - **Minimal Comments**: Code should be self-documenting through clear naming
