@@ -27,7 +27,10 @@ else
     echo "No stage-specific configuration found, creating config with API URL from environment variables"
     # Create appsettings.backend.json with API URL from environment variable
     if [ -n "${API_URL}" ]; then
-        if ! echo "{\"PstApi:ApiUrl\":\"${API_URL}\"}" > "/var/www/web/appsettings.backend.json"; then
+        # Use printf and jq for safe JSON generation to prevent injection
+        # Escape the API_URL value properly for JSON
+        escaped_url=$(printf '%s' "${API_URL}" | sed 's/\\/\\\\/g; s/"/\\"/g')
+        if ! printf '{"PstApi:ApiUrl":"%s"}' "${escaped_url}" > "/var/www/web/appsettings.backend.json"; then
             echo "ERROR: Failed to create backend configuration file"
             exit 1
         fi
