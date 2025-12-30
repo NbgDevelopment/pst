@@ -248,6 +248,7 @@ The project uses Terraform to manage Azure infrastructure as code. All Terraform
 
 ### Container Apps Scaling
 - **All container apps scale down to 0 replicas when idle**
+- **IMPORTANT**: Any new container apps created in the future must also be configured with `min_replicas = 0` to maintain cost efficiency
 - API and Web apps use HTTP scale rules (100 concurrent requests threshold)
 - This provides cost efficiency by only consuming resources under load
 - API: `min_replicas = 0`, `max_replicas = 2`
