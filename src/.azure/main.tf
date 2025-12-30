@@ -41,6 +41,7 @@ module "api" {
   connectionstring_queues          = module.storage.primary_queue_connectionstring
   registry_username                = var.registry_username
   registry_password                = var.registry_password
+  web_fqdn                         = "https://aca-pst-${var.stage}-web.${module.container-environment.default_domain}"
 }
 
 module "processing" {

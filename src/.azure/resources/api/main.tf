@@ -33,6 +33,10 @@ resource "azurerm_container_app" "api" {
         name  = "ASPNETCORE_ENVIRONMENT"
         value = var.stage == "dev" ? "Development" : var.stage == "debug" ? "Development" : "Production"
       }
+      env {
+        name  = "Cors__AllowedOrigins"
+        value = var.web_fqdn
+      }
     }
   }
 

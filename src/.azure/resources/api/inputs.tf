@@ -48,3 +48,8 @@ variable "connectionstring_queues" {
   type      = string
   sensitive = true
 }
+
+variable "web_fqdn" {
+  type        = string
+  description = "The FQDN of the web application for CORS configuration"
+}
