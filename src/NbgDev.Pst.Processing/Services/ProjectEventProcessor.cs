@@ -30,11 +30,27 @@ public class ProjectEventProcessor(
                     maxMessages: 10,
                     cancellationToken: stoppingToken);
 
-                foreach (var message in messages.Value ?? [])
+                if (messages.Value == null || messages.Value.Length == 0)
+                {
+                    await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
+                    continue;
+                }
+
+                foreach (var message in messages.Value)
                 {
                     try
                     {
-                        var projectCreatedEvent = JsonSerializer.Deserialize<ProjectCreatedEvent>(message.MessageText);
+                        ProjectCreatedEvent? projectCreatedEvent = null;
+                        try
+                        {
+                            projectCreatedEvent = JsonSerializer.Deserialize<ProjectCreatedEvent>(message.MessageText);
+                        }
+                        catch (JsonException ex)
+                        {
+                            logger.LogError(ex, "Failed to deserialize message {MessageId}. Invalid JSON format", message.MessageId);
+                            await apiQueue.DeleteMessageAsync(message.MessageId, message.PopReceipt, stoppingToken);
+                            continue;
+                        }
                         
                         if (projectCreatedEvent != null)
                         {
