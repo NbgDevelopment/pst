@@ -1,19 +1,15 @@
-resource "azurerm_container_app" "api" {
-  name                         = "aca-pst-${var.stage}-api"
+resource "azurerm_container_app" "processing" {
+  name                         = "aca-pst-${var.stage}-processing"
   container_app_environment_id = var.container_app_environment_id
   resource_group_name          = var.resource_group_name
   tags                         = var.tags
   revision_mode                = "Single"
 
   template {
-    min_replicas = 0
+    min_replicas = 1
     max_replicas = 2
-    http_scale_rule {
-      name                = "http-scale-rule"
-      concurrent_requests = 100
-    }
     container {
-      name   = "pst-api"
+      name   = "pst-processing"
       image  = var.image
       cpu    = 0.25
       memory = "0.5Gi"
@@ -22,11 +18,11 @@ resource "azurerm_container_app" "api" {
         value = var.app_insights_instrumentation_key
       }
       env {
-        name        = "ConnectionStrings__Projects"
-        secret_name = "connectionstring-projects"
+        name        = "ConnectionStrings__ApiQueues"
+        secret_name = "connectionstring-queues"
       }
       env {
-        name        = "ConnectionStrings__ApiQueues"
+        name        = "ConnectionStrings__ProcessingQueues"
         secret_name = "connectionstring-queues"
       }
       env {
@@ -42,11 +38,6 @@ resource "azurerm_container_app" "api" {
   }
 
   secret {
-    name  = "connectionstring-projects"
-    value = var.connectionstring_projects
-  }
-
-  secret {
     name  = "connectionstring-queues"
     value = var.connectionstring_queues
   }
@@ -59,7 +50,7 @@ resource "azurerm_container_app" "api" {
 
   ingress {
     target_port      = 8080
-    external_enabled = true
+    external_enabled = false
     transport        = "http"
     traffic_weight {
       latest_revision = true

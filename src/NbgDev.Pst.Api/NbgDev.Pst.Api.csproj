@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <PackageReference Include="Aspire.Azure.Data.Tables" Version="9.5.2" />
+    <PackageReference Include="Aspire.Azure.Storage.Queues" Version="9.5.2" />
     <PackageReference Include="MediatR" Version="13.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" NoWarn="NU1605" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="9.0.10" NoWarn="NU1605" />
@@ -24,6 +25,7 @@
     <ProjectReference Include="..\NbgDev.Pst.Projects.AzureTable\NbgDev.Pst.Projects.AzureTable.csproj" />
     <ProjectReference Include="..\NbgDev.Pst.Projects.Contract\NbgDev.Pst.Projects.Contract.csproj" />
     <ProjectReference Include="..\NbgDev.Pst\NbgDev.Pst.ServiceDefaults\NbgDev.Pst.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\NbgDev.Pst.Events.Contract\NbgDev.Pst.Events.Contract.csproj" />
   </ItemGroup>
 
 </Project>

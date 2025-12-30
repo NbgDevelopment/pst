@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
+using NbgDev.Pst.Api.Services;
 using NbgDev.Pst.Projects.AzureTable;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,9 @@ builder.Services.AddMediatR(config =>
 
 builder.AddAzureTableClient("Projects");
 builder.Services.AddProjectsAzureTable();
+
+builder.AddAzureQueueClient("ApiQueues");
+builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 
 builder.Services.AddControllers();
 builder.Services.AddCors(cors =>
