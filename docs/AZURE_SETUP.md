@@ -35,12 +35,30 @@ First, create an App Registration that will be used by GitHub Actions to authent
 
 ### Using Azure CLI
 
+#### Bash
+
 ```bash
 # Create the app registration
 az ad app create --display-name "pst-github-actions"
 
 # Note the appId (DEPLOYMENT_CLIENT_ID) and copy it for the next step
 APP_ID="<your-app-id>"
+
+# Create a service principal for the app
+az ad sp create --id $APP_ID
+
+# Get your tenant ID (DEPLOYMENT_TENANT_ID)
+az account show --query tenantId -o tsv
+```
+
+#### PowerShell
+
+```powershell
+# Create the app registration
+az ad app create --display-name "pst-github-actions"
+
+# Note the appId (DEPLOYMENT_CLIENT_ID) and copy it for the next step
+$APP_ID = "<your-app-id>"
 
 # Create a service principal for the app
 az ad sp create --id $APP_ID
@@ -71,6 +89,8 @@ Federated identity credentials allow GitHub Actions to authenticate to Azure usi
 
 ### Using Azure CLI
 
+#### Bash
+
 ```bash
 # Set variables
 APP_ID="<your-app-id>"
@@ -87,6 +107,27 @@ az ad app federated-credential create \
     \"subject\": \"repo:${GITHUB_ORG}/${GITHUB_REPO}:environment:${ENVIRONMENT}\",
     \"description\": \"GitHub Actions federated credential for dev environment\",
     \"audiences\": [\"api://AzureADTokenExchange\"]
+  }"
+```
+
+#### PowerShell
+
+```powershell
+# Set variables
+$APP_ID = "<your-app-id>"
+$GITHUB_ORG = "NbgDevelopment"
+$GITHUB_REPO = "pst"
+$ENVIRONMENT = "dev"
+
+# Create federated credential for the dev environment
+az ad app federated-credential create `
+  --id $APP_ID `
+  --parameters "{
+    \`"name\`": \`"pst-dev-environment\`",
+    \`"issuer\`": \`"https://token.actions.githubusercontent.com\`",
+    \`"subject\`": \`"repo:$GITHUB_ORG/$GITHUB_REPO:environment:$ENVIRONMENT\`",
+    \`"description\`": \`"GitHub Actions federated credential for dev environment\`",
+    \`"audiences\`": [\`"api://AzureADTokenExchange\`"]
   }"
 ```
 
@@ -110,6 +151,8 @@ The App Registration's service principal needs permissions to manage Azure resou
 
 ### Using Azure CLI
 
+#### Bash
+
 ```bash
 # Set variables
 APP_ID="<your-app-id>"
@@ -123,6 +166,24 @@ az role assignment create \
   --assignee-object-id $SP_OBJECT_ID \
   --assignee-principal-type ServicePrincipal \
   --role Contributor \
+  --scope /subscriptions/$SUBSCRIPTION_ID
+```
+
+#### PowerShell
+
+```powershell
+# Set variables
+$APP_ID = "<your-app-id>"
+$SUBSCRIPTION_ID = "<your-subscription-id>"
+
+# Get the service principal object ID
+$SP_OBJECT_ID = az ad sp show --id $APP_ID --query id -o tsv
+
+# Assign Contributor role at subscription level
+az role assignment create `
+  --assignee-object-id $SP_OBJECT_ID `
+  --assignee-principal-type ServicePrincipal `
+  --role Contributor `
   --scope /subscriptions/$SUBSCRIPTION_ID
 ```
 
@@ -144,6 +205,8 @@ Terraform requires a storage backend to maintain state. We use Azure Blob Storag
 ### Create Storage Resources
 
 If you haven't already created the storage resources, create them:
+
+#### Bash
 
 ```bash
 # Set variables
@@ -169,9 +232,37 @@ az storage container create \
   --account-name $STORAGE_ACCOUNT
 ```
 
+#### PowerShell
+
+```powershell
+# Set variables
+$LOCATION = "germanywestcentral"
+$RG_NAME = "rg-pst-management"
+$STORAGE_ACCOUNT = "stpstmanagement"
+$CONTAINER_NAME = "terraform-states"
+
+# Create resource group
+az group create --name $RG_NAME --location $LOCATION
+
+# Create storage account
+az storage account create `
+  --name $STORAGE_ACCOUNT `
+  --resource-group $RG_NAME `
+  --location $LOCATION `
+  --sku Standard_LRS `
+  --allow-blob-public-access false
+
+# Create container
+az storage container create `
+  --name $CONTAINER_NAME `
+  --account-name $STORAGE_ACCOUNT
+```
+
 ### Generate SAS Token
 
 Create a SAS token with appropriate permissions and expiration:
+
+#### Bash
 
 ```bash
 # Set variables
@@ -194,6 +285,29 @@ az storage account generate-sas \
   --resource-types sco \
   --expiry $EXPIRY_DATE \
   --https-only \
+  --output tsv
+```
+
+#### PowerShell
+
+```powershell
+# Set variables
+$STORAGE_ACCOUNT = "stpstmanagement"
+
+# Calculate expiry date (1 year from now)
+$EXPIRY_DATE = (Get-Date).AddYears(1).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
+
+# Or specify the date manually:
+# $EXPIRY_DATE = "2026-12-30T23:59:59Z"
+
+# Generate SAS token
+az storage account generate-sas `
+  --account-name $STORAGE_ACCOUNT `
+  --permissions cdlruwap `
+  --services b `
+  --resource-types sco `
+  --expiry $EXPIRY_DATE `
+  --https-only `
   --output tsv
 ```
 
