@@ -120,15 +120,18 @@ $GITHUB_REPO = "pst"
 $ENVIRONMENT = "dev"
 
 # Create federated credential for the dev environment
+$subject = "repo:$GITHUB_ORG/$GITHUB_REPO:environment:$ENVIRONMENT"
 az ad app federated-credential create `
   --id $APP_ID `
-  --parameters "{
-    \`"name\`": \`"pst-dev-environment\`",
-    \`"issuer\`": \`"https://token.actions.githubusercontent.com\`",
-    \`"subject\`": \`"repo:$GITHUB_ORG/$GITHUB_REPO:environment:$ENVIRONMENT\`",
-    \`"description\`": \`"GitHub Actions federated credential for dev environment\`",
-    \`"audiences\`": [\`"api://AzureADTokenExchange\`"]
-  }"
+  --parameters @"
+{
+  \"name\": \"pst-dev-environment\",
+  \"issuer\": \"https://token.actions.githubusercontent.com\",
+  \"subject\": \"$subject\",
+  \"description\": \"GitHub Actions federated credential for dev environment\",
+  \"audiences\": [\"api://AzureADTokenExchange\"]
+}
+"@
 ```
 
 ## 3. Assign Azure RBAC Permissions
