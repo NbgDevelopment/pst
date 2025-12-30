@@ -7,7 +7,7 @@ namespace NbgDev.Pst.Api.Services;
 
 public class EventProcessor(
     QueueServiceClient processingQueueClient,
-    IEnumerable<IEventHandler> eventHandlers,
+    IServiceScopeFactory serviceScopeFactory,
     ILogger<EventProcessor> logger) : BackgroundService
 {
     private const string ProcessingQueueName = "processing-events";
@@ -37,6 +37,9 @@ public class EventProcessor(
                 {
                     try
                     {
+                        using var scope = serviceScopeFactory.CreateScope();
+                        var eventHandlers = scope.ServiceProvider.GetServices<IEventHandler>();
+
                         BaseEvent? @event = null;
                         string? eventType = null;
 
