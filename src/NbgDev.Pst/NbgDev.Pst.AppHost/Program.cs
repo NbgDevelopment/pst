@@ -12,8 +12,10 @@ var processingQueues = storage.AddQueues("ProcessingQueues");
 var api = builder.AddProject<Projects.NbgDev_Pst_Api>("nbgdev-pst-api")
     .WithReference(projectStorage)
     .WithReference(apiQueues)
+    .WithReference(processingQueues)
     .WaitFor(projectStorage)
-    .WaitFor(apiQueues);
+    .WaitFor(apiQueues)
+    .WaitFor(processingQueues);
 
 var processing = builder.AddProject<Projects.NbgDev_Pst_Processing>("nbgdev-pst-processing")
     .WithReference(apiQueues)
