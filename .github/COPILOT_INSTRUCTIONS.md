@@ -143,6 +143,7 @@ public static class BootstrapProjectsAzureTable
 ### Package Management
 
 - Package versions defined directly in project files
+- **IMPORTANT**: Only packages with MIT license can be referenced to ensure license compatibility and compliance
 - Key dependencies:
   - **MediatR** - CQRS pattern
   - **Aspire.Azure.Data.Tables** - Azure Table Storage integration
