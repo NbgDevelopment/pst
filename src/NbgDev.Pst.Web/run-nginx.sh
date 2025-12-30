@@ -13,10 +13,8 @@ if [ -n "${stage}" ]; then
         unset stage
     elif [ "${sanitized_stage}" != "${stage}" ]; then
         echo "Warning: stage variable contained invalid characters and was sanitized"
-        stage="${sanitized_stage}"
-    else
-        stage="${sanitized_stage}"
     fi
+    stage="${sanitized_stage}"
 fi
 
 if [ -n "${stage}" ] && [ -f "/var/www/web/appsettings.${stage}.json" ]; then
