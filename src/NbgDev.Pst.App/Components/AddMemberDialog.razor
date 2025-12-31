@@ -29,7 +29,7 @@
                         <MudListItem T="string" OnClick="@(() => SelectUser(user))">
                             <div class="d-flex align-center">
                                 <MudAvatar Color="Color.Primary" Class="mr-3">
-                                    @user.GivenName.FirstOrDefault()@user.Surname.FirstOrDefault()
+                                    @(GetInitials(user))
                                 </MudAvatar>
                                 <div>
                                     <MudText Typo="Typo.body1">@user.DisplayName</MudText>

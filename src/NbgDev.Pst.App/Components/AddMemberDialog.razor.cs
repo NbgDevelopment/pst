@@ -97,4 +97,11 @@ public partial class AddMemberDialog
             Snackbar.Add($"Failed to add member: {ex.Message}", Severity.Error);
         }
     }
+
+    private static string GetInitials(EntraIdUser user)
+    {
+        var firstInitial = !string.IsNullOrEmpty(user.GivenName) ? user.GivenName[0] : '?';
+        var lastInitial = !string.IsNullOrEmpty(user.Surname) ? user.Surname[0] : '?';
+        return $"{firstInitial}{lastInitial}";
+    }
 }

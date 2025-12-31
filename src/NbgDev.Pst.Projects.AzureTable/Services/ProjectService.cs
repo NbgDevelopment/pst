@@ -77,8 +77,9 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
             await tableClient.DeleteEntityAsync(partitionKey, userId);
             return true;
         }
-        catch
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
         {
+            // Entity doesn't exist
             return false;
         }
     }
