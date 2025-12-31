@@ -42,6 +42,10 @@ module "api" {
   registry_username                = var.registry_username
   registry_password                = var.registry_password
   web_fqdn                         = "https://aca-pst-${var.stage}-web.${module.container-environment.default_domain}"
+  azure_ad_tenant_id               = var.azure_ad_tenant_id
+  azure_ad_client_id               = var.azure_ad_client_id
+  azure_ad_client_secret           = var.azure_ad_client_secret
+  azure_ad_audience                = var.azure_ad_audience
 }
 
 module "processing" {

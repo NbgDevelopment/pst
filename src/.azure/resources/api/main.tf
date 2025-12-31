@@ -37,6 +37,26 @@ resource "azurerm_container_app" "api" {
         name  = "Cors__AllowedOrigins"
         value = var.web_fqdn
       }
+      env {
+        name  = "AzureAd__TenantId"
+        value = var.azure_ad_tenant_id
+      }
+      env {
+        name  = "AzureAd__ClientId"
+        value = var.azure_ad_client_id
+      }
+      env {
+        name        = "AzureAd__ClientSecret"
+        secret_name = "azuread-client-secret"
+      }
+      env {
+        name  = "AzureAd__Audience"
+        value = var.azure_ad_audience
+      }
+      env {
+        name  = "AzureAd__Instance"
+        value = "https://login.microsoftonline.com/"
+      }
     }
   }
 
@@ -53,6 +73,11 @@ resource "azurerm_container_app" "api" {
   secret {
     name  = "connectionstring-queues"
     value = var.connectionstring_queues
+  }
+
+  secret {
+    name  = "azuread-client-secret"
+    value = var.azure_ad_client_secret
   }
 
   registry {

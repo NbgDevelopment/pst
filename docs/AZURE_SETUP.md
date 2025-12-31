@@ -531,6 +531,65 @@ Update your API's `appsettings.json` or Azure Configuration to include:
 - The API uses `ClientSecretCredential` from Azure.Identity to authenticate directly to Microsoft Graph with application permissions
 - No `MicrosoftGraph` section is needed in configuration as the client is configured programmatically
 
+### Deployment Configuration
+
+#### Manual Deployment
+
+For local development or manual deployments:
+
+1. **Using User Secrets** (Recommended for development):
+   ```bash
+   cd src/NbgDev.Pst.Api
+   dotnet user-secrets set "AzureAd:TenantId" "<your-tenant-id>"
+   dotnet user-secrets set "AzureAd:ClientId" "<your-api-app-id>"
+   dotnet user-secrets set "AzureAd:ClientSecret" "<your-client-secret>"
+   dotnet user-secrets set "AzureAd:Audience" "<your-api-audience>"
+   ```
+
+2. **Using Environment Variables**:
+   ```bash
+   export AzureAd__TenantId="<your-tenant-id>"
+   export AzureAd__ClientId="<your-api-app-id>"
+   export AzureAd__ClientSecret="<your-client-secret>"
+   export AzureAd__Audience="<your-api-audience>"
+   ```
+
+#### Terraform Deployment
+
+For automated Terraform deployments, the Azure AD configuration is managed via Terraform variables:
+
+1. **Create a `terraform.tfvars` file** in the `src/.azure` directory (this file is git-ignored):
+   ```hcl
+   azure_ad_tenant_id      = "<your-tenant-id>"
+   azure_ad_client_id      = "<your-api-app-id>"
+   azure_ad_client_secret  = "<your-client-secret>"
+   azure_ad_audience       = "<your-api-audience>"
+   ```
+
+2. **Or set via GitHub Secrets** for CI/CD:
+   - `AZURE_AD_TENANT_ID` - Your Azure AD tenant ID
+   - `AZURE_AD_CLIENT_ID` - Your API App Registration client ID
+   - `AZURE_AD_CLIENT_SECRET` - Your API App Registration client secret
+   - `AZURE_AD_AUDIENCE` - Your API identifier URI (e.g., `api://pst-api-dev`)
+
+3. **Update your CD workflow** to pass these variables to Terraform:
+   ```yaml
+   - name: Terraform Apply
+     run: |
+       terraform apply -auto-approve \
+         -var="azure_ad_tenant_id=${{ secrets.AZURE_AD_TENANT_ID }}" \
+         -var="azure_ad_client_id=${{ secrets.AZURE_AD_CLIENT_ID }}" \
+         -var="azure_ad_client_secret=${{ secrets.AZURE_AD_CLIENT_SECRET }}" \
+         -var="azure_ad_audience=${{ secrets.AZURE_AD_AUDIENCE }}" \
+         ... (other variables)
+   ```
+
+**Security Notes:**
+- The client secret is stored as a Container App secret and injected as an environment variable
+- Never commit `terraform.tfvars` to source control (it's already in `.gitignore`)
+- Rotate secrets regularly before they expire
+- Consider using Azure Key Vault references for production deployments
+
 ### Security Best Practices
 
 - **Minimize Permissions**: The API only requests `User.Read.All`, which is the minimum permission needed to search for users
@@ -553,6 +612,25 @@ Update your API's `appsettings.json` or Azure Configuration to include:
 - Verify the API is using the correct tenant ID
 - Check that the search term matches users in your directory
 - Ensure the users have the required properties (mail, givenName, surname)
+
+### GitHub Secrets Configuration for CD Pipeline
+
+To enable automated deployments with the Azure AD configuration, add the following secrets to your GitHub repository:
+
+1. Navigate to your GitHub repository
+2. Go to **Settings** > **Secrets and variables** > **Actions**
+3. Add the following **Repository secrets**:
+   - `AZURE_AD_TENANT_ID` - Your Azure AD tenant ID (same as in step 1)
+   - `AZURE_AD_CLIENT_ID` - Your API App Registration client ID (from "Create API App Registration" above)
+   - `AZURE_AD_CLIENT_SECRET` - Your API App Registration client secret (from "Create a Client Secret" above)
+   - `AZURE_AD_AUDIENCE` - Your API identifier URI (e.g., `api://pst-api-dev` or the App ID URI you configured)
+
+These secrets are automatically used by the CD workflow to configure the Azure Container App with the necessary Azure AD authentication settings.
+
+**Important**: 
+- These are different from the `DEPLOYMENT_CLIENT_ID` and `DEPLOYMENT_TENANT_ID` which are used for GitHub Actions to authenticate to Azure
+- The `AZURE_AD_*` secrets configure the API application itself for authenticating to Microsoft Graph
+- Rotate the `AZURE_AD_CLIENT_SECRET` before it expires (you'll need to generate a new one in Azure AD and update the GitHub secret)
 
 ## Resources
 
