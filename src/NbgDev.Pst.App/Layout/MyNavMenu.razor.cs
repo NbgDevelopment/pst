@@ -35,15 +35,21 @@ public partial class MyNavMenu : IDisposable
     private async Task LoadProjects(bool isAuthenticated)
     {
         IsLoading = true;
-        Projects.Clear();
 
-        if (isAuthenticated)
+        try
         {
-            Projects.AddRange(await _projectService.GetProjects());
-        }
+            Projects.Clear();
 
-        IsLoading = false;
-        StateHasChanged();
+            if (isAuthenticated)
+            {
+                Projects.AddRange(await _projectService.GetProjects());
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
+        }
     }
 
     private void OnProjectCreated(Project project)
