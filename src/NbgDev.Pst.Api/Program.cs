@@ -22,6 +22,19 @@ builder.Services.AddSingleton<GraphServiceClient>(sp =>
     var clientId = config["AzureAd:ClientId"];
     var clientSecret = config["AzureAd:ClientSecret"];
     
+    if (string.IsNullOrEmpty(tenantId))
+    {
+        throw new InvalidOperationException("AzureAd:TenantId is not configured. Please set it in appsettings.json or user secrets.");
+    }
+    if (string.IsNullOrEmpty(clientId))
+    {
+        throw new InvalidOperationException("AzureAd:ClientId is not configured. Please set it in appsettings.json or user secrets.");
+    }
+    if (string.IsNullOrEmpty(clientSecret))
+    {
+        throw new InvalidOperationException("AzureAd:ClientSecret is not configured. Please set it in user secrets, environment variables, or Azure Key Vault. Never commit secrets to source control.");
+    }
+    
     var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
     return new GraphServiceClient(credential);
 });

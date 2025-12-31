@@ -48,6 +48,8 @@ public partial class AddMemberDialog
         }
 
         _isSearching = true;
+        StateHasChanged();
+        
         try
         {
             var users = await EntraIdService.SearchUsers(_searchTerm);
@@ -60,6 +62,7 @@ public partial class AddMemberDialog
         finally
         {
             _isSearching = false;
+            StateHasChanged();
         }
     }
 
