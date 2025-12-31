@@ -524,7 +524,7 @@ Update your API's `appsettings.json` or Azure Configuration to include:
   },
   "MicrosoftGraph": {
     "BaseUrl": "https://graph.microsoft.com/v1.0",
-    "Scopes": "https://graph.microsoft.com/.default"
+    "Scopes": [ "https://graph.microsoft.com/.default" ]
   }
 }
 ```
@@ -532,7 +532,7 @@ Update your API's `appsettings.json` or Azure Configuration to include:
 **Important Notes:**
 - The `ClientSecret` should be stored securely (use Azure Key Vault, user secrets, or environment variables in production)
 - Never commit secrets to source control
-- The `Scopes` value should be `https://graph.microsoft.com/.default` for application permissions (not `User.Read.All`)
+- The `Scopes` value must be an array containing `"https://graph.microsoft.com/.default"` for application permissions
 - The application uses **application permissions** (client credentials flow), not delegated permissions
 
 ### Security Best Practices
