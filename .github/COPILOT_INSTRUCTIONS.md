@@ -237,6 +237,32 @@ The project uses Terraform to manage Azure infrastructure as code. All Terraform
   - `web/`: Web container app
   - `processing/`: Background processing container app
 
+### Terraform Version Management
+
+**IMPORTANT**: When making changes to Terraform templates, always follow these practices:
+
+1. **Update to Latest Stable Versions**:
+   - Update Terraform itself to the latest stable version
+   - Update all provider plugins (e.g., `azurerm`) to their latest stable versions
+   - Check the provider's changelog for breaking changes
+
+2. **Adapt to Breaking Changes**:
+   - Review the upgrade guides and changelogs for Terraform and all providers
+   - Test all changes thoroughly before deployment
+   - Update template syntax and resource configurations to align with new versions
+   - Ensure backward compatibility considerations are documented
+
+3. **Version Constraints**:
+   - Update the `required_version` in `provider.tf` to the new Terraform version
+   - Update the provider version constraints in `required_providers` block
+   - Use specific version numbers (not ranges) for production stability
+
+4. **Validation**:
+   - Run `terraform fmt` to ensure consistent formatting
+   - Run `terraform validate` to check configuration validity
+   - Test initialization with `terraform init`
+   - These checks are automated in the CI workflow
+
 ### Key Resources
 1. **Resource Group**: `rg-pst-{stage}` in Germany West Central region
 2. **Monitoring**: Application Insights for telemetry and logging
