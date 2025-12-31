@@ -10,10 +10,10 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"))
-    .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddMicrosoftGraph(builder.Configuration.GetSection("MicrosoftGraph"))
-    .AddInMemoryTokenCaches();
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+// Add Microsoft Graph with client credentials flow (application permissions)
+builder.Services.AddMicrosoftGraph(builder.Configuration.GetSection("MicrosoftGraph"));
 
 builder.Services.AddMediatR(config =>
 {
