@@ -27,7 +27,7 @@ variable "registry_username" {
 }
 
 variable "registry_password" {
-  type = string
+  type      = string
   sensitive = true
 }
 
@@ -36,10 +36,10 @@ variable "image" {
 }
 
 variable "api_url" {
-  type = string
+  type        = string
   description = "The URL of the API endpoint"
   validation {
-    condition = can(regex("^https?://", var.api_url))
+    condition     = can(regex("^https?://", var.api_url))
     error_message = "API URL must be a valid HTTP/HTTPS URL."
   }
 }

@@ -3,7 +3,7 @@ terraform {
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "4.22.0"
+      version = "4.57.0"
     }
   }
 
@@ -13,7 +13,7 @@ terraform {
     container_name       = "terraform-states"
   }
 
-  required_version = ">= 1.11.2"
+  required_version = ">= 1.14.3"
 }
 
 provider "azurerm" {

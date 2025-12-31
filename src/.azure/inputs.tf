@@ -15,7 +15,7 @@ variable "registry_username" {
 }
 
 variable "registry_password" {
-  type = string
+  type      = string
   sensitive = true
 }
 
