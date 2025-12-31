@@ -3,10 +3,18 @@
     <AuthorizeView>
         <Authorized>
             <MudNavGroup Title="Projects" Expanded="true">
-                @foreach (var project in Projects.OrderBy(p => p.Name))
+                @if (IsLoading)
                 {
-                    var href = $"/project/{project.Id}";
-                    <MudNavLink Href="@href" Match="NavLinkMatch.Prefix">@project.Name</MudNavLink>
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Class="mx-4 my-2" />
+                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Class="mx-4 my-2" />
+                }
+                else
+                {
+                    @foreach (var project in Projects.OrderBy(p => p.Name))
+                    {
+                        var href = $"/project/{project.Id}";
+                        <MudNavLink Href="@href" Match="NavLinkMatch.Prefix">@project.Name</MudNavLink>
+                    }
                 }
                 <MudNavLink Href="/project/create" Match="NavLinkMatch.All">Create</MudNavLink>
             </MudNavGroup>
