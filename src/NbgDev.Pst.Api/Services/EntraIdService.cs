@@ -19,6 +19,7 @@ public class EntraIdService(GraphServiceClient graphClient) : IEntraIdService
                 requestConfiguration.QueryParameters.Search = $"\"displayName:{searchTerm}\" OR \"mail:{searchTerm}\" OR \"userPrincipalName:{searchTerm}\"";
                 requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "givenName", "surname", "mail" };
                 requestConfiguration.QueryParameters.Top = 20;
+                requestConfiguration.QueryParameters.Count = true;
                 requestConfiguration.Headers.Add("ConsistencyLevel", "eventual");
             });
 
