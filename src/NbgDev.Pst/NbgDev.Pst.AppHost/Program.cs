@@ -3,7 +3,10 @@ using NbgDev.Pst.AppHost;
 var builder = DistributedApplication.CreateBuilder(args);
 
 var storage = builder.AddAzureStorage("Storage")
-    .RunAsEmulator();
+    .RunAsEmulator(container =>
+    {
+        container.WithDataVolume();
+    });
 
 var projectStorage = storage.AddTables("Projects");
 var apiQueues = storage.AddQueues("ApiQueues");
