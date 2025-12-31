@@ -21,7 +21,6 @@ public partial class MembersPanel
 
     private List<ProjectMember> _members = new();
     private bool _isLoading = true;
-    private AddMemberDialog? _addMemberDialog;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -46,15 +45,22 @@ public partial class MembersPanel
         }
     }
 
-    private void OpenAddMemberDialog()
+    private async Task OpenAddMemberDialog()
     {
-        _addMemberDialog?.Open();
-    }
+        var parameters = new DialogParameters<AddMemberDialog>
+        {
+            { x => x.ProjectId, ProjectId }
+        };
 
-    private async Task HandleMemberAdded()
-    {
-        await LoadMembers();
-        Snackbar.Add("Member added successfully", Severity.Success);
+        var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };
+        var dialog = await DialogService.ShowAsync<AddMemberDialog>("Add Project Member", parameters, options);
+        var result = await dialog.Result;
+
+        if (result != null && !result.Canceled)
+        {
+            await LoadMembers();
+            Snackbar.Add("Member added successfully", Severity.Success);
+        }
     }
 
     private async Task ConfirmRemoveMember(ProjectMember member)

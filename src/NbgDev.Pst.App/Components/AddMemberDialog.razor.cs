@@ -11,9 +11,6 @@ public partial class AddMemberDialog
     [Parameter]
     public required Guid ProjectId { get; set; }
 
-    [Parameter]
-    public EventCallback OnMemberAdded { get; set; }
-
     [Inject]
     private IEntraIdService EntraIdService { get; set; } = default!;
 
@@ -23,24 +20,16 @@ public partial class AddMemberDialog
     [Inject]
     private ISnackbar Snackbar { get; set; } = default!;
 
-    private bool _isVisible = false;
     private string _searchTerm = string.Empty;
     private List<EntraIdUser> _searchResults = new();
     private bool _isSearching = false;
 
-    public void Open()
-    {
-        _isVisible = true;
-        _searchTerm = string.Empty;
-        _searchResults.Clear();
-        StateHasChanged();
-    }
+    [CascadingParameter]
+    public IMudDialogInstance? DialogInstance { get; set; }
 
     private void Cancel()
     {
-        _isVisible = false;
-        _searchTerm = string.Empty;
-        _searchResults.Clear();
+        DialogInstance?.Close();
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -86,11 +75,7 @@ public partial class AddMemberDialog
                 user.Mail
             );
 
-            _isVisible = false;
-            _searchTerm = string.Empty;
-            _searchResults.Clear();
-
-            await OnMemberAdded.InvokeAsync();
+            DialogInstance?.Close(DialogResult.Ok(true));
         }
         catch (Exception ex)
         {
