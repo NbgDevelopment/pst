@@ -34,8 +34,8 @@ resource "azurerm_container_app" "web" {
   }
 
   registry {
-    server   = "ghcr.io"
-    username = var.registry_username
+    server               = "ghcr.io"
+    username             = var.registry_username
     password_secret_name = "registry-password"
   }
 
@@ -45,7 +45,7 @@ resource "azurerm_container_app" "web" {
     transport        = "http"
     traffic_weight {
       latest_revision = true
-      percentage = 100
+      percentage      = 100
     }
   }
 }
