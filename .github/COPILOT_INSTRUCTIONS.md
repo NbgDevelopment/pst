@@ -253,9 +253,10 @@ The project uses Terraform to manage Azure infrastructure as code. All Terraform
    - Ensure backward compatibility considerations are documented
 
 3. **Version Constraints**:
-   - Update the `required_version` in `provider.tf` to the new Terraform version
-   - Update the provider version constraints in `required_providers` block
-   - Use specific version numbers (not ranges) for production stability
+   - Update the `required_version` in `provider.tf` to specify a minimum Terraform version (e.g., `>= 1.14.3`)
+   - Update the provider version in `required_providers` block to a specific stable version (e.g., `4.57.0`)
+   - Use specific version numbers for providers to ensure predictable deployments
+   - Use minimum version constraints (>=) for Terraform itself to allow flexibility while ensuring compatibility
 
 4. **Validation**:
    - Run `terraform fmt` to ensure consistent formatting
