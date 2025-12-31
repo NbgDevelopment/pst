@@ -10,15 +10,20 @@ builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"))
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddMicrosoftGraph(builder.Configuration.GetSection("MicrosoftGraph"))
+    .AddInMemoryTokenCaches();
 
 builder.Services.AddMediatR(config =>
 {
     config.RegisterServicesFromAssemblyContaining(typeof(BootstrapProjectsAzureTable));
+    config.RegisterServicesFromAssemblyContaining(typeof(Program));
 });
 
 builder.AddAzureTableClient("Projects");
 builder.Services.AddProjectsAzureTable();
+builder.Services.AddScoped<IEntraIdService, EntraIdService>();
 
 builder.AddAzureQueueClient("ApiQueues");
 builder.AddAzureQueueClient("ProcessingQueues");
