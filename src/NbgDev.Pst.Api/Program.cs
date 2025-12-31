@@ -8,12 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Add services to the container.
-// This handles authentication of incoming requests
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
-
-// Add token acquisition for calling Microsoft Graph with app-only permissions
+// Add authentication for incoming requests and token acquisition for Microsoft Graph
 builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration, "AzureAd")
     .EnableTokenAcquisitionToCallDownstreamApi()
     .AddMicrosoftGraph(builder.Configuration.GetSection("MicrosoftGraph"))
