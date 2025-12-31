@@ -69,5 +69,13 @@ resource "azurerm_container_app" "api" {
       latest_revision = true
       percentage      = 100
     }
+    cors {
+      allowed_origins     = [var.web_fqdn]
+      allowed_methods     = ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"]
+      allowed_headers     = ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"]
+      expose_headers      = ["Content-Length", "Content-Type"]
+      allow_credentials   = true
+      max_age             = 3600
+    }
   }
 }

@@ -51,10 +51,10 @@ if (app.Environment.IsDevelopment())
     app.UseOpenApi();
 }
 
+app.UseCors("AllowFrontend");
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseCors("AllowFrontend");
 
 app.MapControllers().RequireAuthorization();
 
