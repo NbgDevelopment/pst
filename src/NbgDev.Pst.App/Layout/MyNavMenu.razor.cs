@@ -35,6 +35,7 @@ public partial class MyNavMenu : IDisposable
     private async Task LoadProjects(bool isAuthenticated)
     {
         IsLoading = true;
+        StateHasChanged();
 
         try
         {
