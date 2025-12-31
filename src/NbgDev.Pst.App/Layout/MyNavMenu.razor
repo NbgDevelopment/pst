@@ -5,8 +5,10 @@
             <MudNavGroup Title="Projects" Expanded="true">
                 @if (IsLoading)
                 {
-                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Class="mx-4 my-2" />
-                    <MudSkeleton SkeletonType="SkeletonType.Text" Height="40px" Class="mx-4 my-2" />
+                    <div class="d-flex align-center justify-center pa-4">
+                        <MudProgressCircular Size="Size.Small" Indeterminate="true" />
+                        <MudText Class="ml-2">Loading...</MudText>
+                    </div>
                 }
                 else
                 {
