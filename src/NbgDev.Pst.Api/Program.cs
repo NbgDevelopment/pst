@@ -1,4 +1,6 @@
+using Azure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Graph;
 using Microsoft.Identity.Web;
 using NbgDev.Pst.Api.Services;
 using NbgDev.Pst.Api.Services.EventHandlers;
@@ -8,11 +10,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-// Add authentication for incoming requests and token acquisition for Microsoft Graph
-builder.Services.AddMicrosoftIdentityWebApiAuthentication(builder.Configuration, "AzureAd")
-    .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddMicrosoftGraph(builder.Configuration.GetSection("MicrosoftGraph"))
-    .AddInMemoryTokenCaches();
+// Add authentication for incoming API requests
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+// Configure GraphServiceClient with app-only authentication (client credentials)
+builder.Services.AddSingleton<GraphServiceClient>(sp =>
+{
+    var config = builder.Configuration;
+    var tenantId = config["AzureAd:TenantId"];
+    var clientId = config["AzureAd:ClientId"];
+    var clientSecret = config["AzureAd:ClientSecret"];
+    
+    var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+    return new GraphServiceClient(credential);
+});
 
 builder.Services.AddMediatR(config =>
 {

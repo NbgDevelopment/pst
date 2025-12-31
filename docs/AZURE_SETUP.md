@@ -521,10 +521,6 @@ Update your API's `appsettings.json` or Azure Configuration to include:
     "ClientId": "<your-api-app-id>",
     "ClientSecret": "<your-client-secret>",
     "Audience": "<your-api-audience>"
-  },
-  "MicrosoftGraph": {
-    "BaseUrl": "https://graph.microsoft.com/v1.0",
-    "Scopes": [ "https://graph.microsoft.com/.default" ]
   }
 }
 ```
@@ -532,8 +528,8 @@ Update your API's `appsettings.json` or Azure Configuration to include:
 **Important Notes:**
 - The `ClientSecret` should be stored securely (use Azure Key Vault, user secrets, or environment variables in production)
 - Never commit secrets to source control
-- The `Scopes` value must be an array containing `"https://graph.microsoft.com/.default"` for application permissions
-- The application uses **application permissions** (client credentials flow), not delegated permissions
+- The API uses `ClientSecretCredential` from Azure.Identity to authenticate directly to Microsoft Graph with application permissions
+- No `MicrosoftGraph` section is needed in configuration as the client is configured programmatically
 
 ### Security Best Practices
 
