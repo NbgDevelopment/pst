@@ -1,0 +1,52 @@
+@using NbgDev.Pst.App.Models
+@using NbgDev.Pst.App.Services
+
+@if (_isVisible)
+{
+    <MudDialog>
+        <TitleContent>
+            <MudText Typo="Typo.h6">Add Project Member</MudText>
+        </TitleContent>
+        <DialogContent>
+            <MudTextField @bind-Value="_searchTerm" 
+                          Label="Search Users" 
+                          Variant="Variant.Outlined"
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Material.Filled.Search"
+                          OnAdornmentClick="SearchUsers"
+                          OnKeyDown="HandleKeyDown"
+                          Class="mb-4" />
+
+            @if (_isSearching)
+            {
+                <MudProgressCircular Indeterminate="true" Size="Size.Small" />
+            }
+            else if (_searchResults.Any())
+            {
+                <MudList T="string">
+                    @foreach (var user in _searchResults)
+                    {
+                        <MudListItem T="string" OnClick="@(() => SelectUser(user))">
+                            <div class="d-flex align-center">
+                                <MudAvatar Color="Color.Primary" Class="mr-3">
+                                    @user.GivenName.FirstOrDefault()@user.Surname.FirstOrDefault()
+                                </MudAvatar>
+                                <div>
+                                    <MudText Typo="Typo.body1">@user.DisplayName</MudText>
+                                    <MudText Typo="Typo.body2" Color="Color.Secondary">@user.Mail</MudText>
+                                </div>
+                            </div>
+                        </MudListItem>
+                    }
+                </MudList>
+            }
+            else if (!string.IsNullOrWhiteSpace(_searchTerm) && !_isSearching)
+            {
+                <MudText>No users found. Try a different search term.</MudText>
+            }
+        </DialogContent>
+        <DialogActions>
+            <MudButton OnClick="Cancel">Cancel</MudButton>
+        </DialogActions>
+    </MudDialog>
+}

@@ -22,6 +22,28 @@ public static class Bootstrap
             };
         });
 
+        services.AddScoped<IProjectMemberClient>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<PstApiClientOptions>>();
+            var accessTokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
+            var httpClient = new HttpClient { BaseAddress = new Uri(options.Value.ApiUrl) };
+            return new ProjectMemberClient(httpClient)
+            {
+                AccessTokenProvider = accessTokenProvider
+            };
+        });
+
+        services.AddScoped<IEntraIdClient>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<PstApiClientOptions>>();
+            var accessTokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
+            var httpClient = new HttpClient { BaseAddress = new Uri(options.Value.ApiUrl) };
+            return new EntraIdClient(httpClient)
+            {
+                AccessTokenProvider = accessTokenProvider
+            };
+        });
+
         return services;
     }
 }

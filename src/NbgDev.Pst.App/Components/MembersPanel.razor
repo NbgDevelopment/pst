@@ -1,0 +1,46 @@
+@using NbgDev.Pst.App.Models
+@using NbgDev.Pst.App.Services
+
+<div class="pa-4">
+    <div class="d-flex justify-space-between align-center mb-4">
+        <MudText Typo="Typo.h6">Project Members</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddMemberDialog">
+            Add Member
+        </MudButton>
+    </div>
+
+    @if (_isLoading)
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+    else if (_members == null || !_members.Any())
+    {
+        <MudText>No members assigned to this project yet.</MudText>
+    }
+    else
+    {
+        <MudTable Items="_members" Hover="true" Striped="true">
+            <HeaderContent>
+                <MudTh>First Name</MudTh>
+                <MudTh>Last Name</MudTh>
+                <MudTh>Email</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+                <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+                <MudTd DataLabel="Email">@context.Email</MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                   Color="Color.Error" 
+                                   OnClick="@(() => ConfirmRemoveMember(context))"
+                                   Size="Size.Small" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</div>
+
+<AddMemberDialog @ref="_addMemberDialog" 
+                 ProjectId="@ProjectId" 
+                 OnMemberAdded="HandleMemberAdded" />
