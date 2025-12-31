@@ -37,12 +37,9 @@ builder.Services.AddSingleton<GraphServiceClient>(sp =>
     
     var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
     
-    // Create HTTP client with custom handler for ConsistencyLevel header
-    var handlers = new List<DelegatingHandler>(GraphClientFactory.CreateDefaultHandlers())
-    {
-        new GraphConsistencyLevelHandler()
-    };
-    var httpClient = GraphClientFactory.Create(handlers);
+    // Create HTTP client with default ConsistencyLevel header
+    var httpClient = GraphClientFactory.Create(GraphClientFactory.CreateDefaultHandlers());
+    httpClient.DefaultRequestHeaders.Add("ConsistencyLevel", "eventual");
     
     return new GraphServiceClient(httpClient, credential);
 });
