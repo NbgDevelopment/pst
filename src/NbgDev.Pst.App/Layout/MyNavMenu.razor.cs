@@ -24,6 +24,7 @@ public partial class MyNavMenu : IDisposable
     }
 
     private List<Project> Projects { get; set; } = [];
+    private bool IsLoading { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
@@ -33,11 +34,22 @@ public partial class MyNavMenu : IDisposable
 
     private async Task LoadProjects(bool isAuthenticated)
     {
-        Projects.Clear();
+        IsLoading = true;
+        StateHasChanged();
 
-        if (isAuthenticated)
+        try
         {
-            Projects.AddRange(await _projectService.GetProjects());
+            Projects.Clear();
+
+            if (isAuthenticated)
+            {
+                Projects.AddRange(await _projectService.GetProjects());
+            }
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged();
         }
     }
 
