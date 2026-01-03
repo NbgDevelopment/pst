@@ -45,10 +45,4 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.Cache.CacheLocation = "localStorage";
 });
 
-var host = builder.Build();
-
-// Clear expired tokens before running the app
-var tokenExpirationService = host.Services.GetRequiredService<TokenExpirationService>();
-await tokenExpirationService.ClearExpiredTokensAsync();
-
-await host.RunAsync();
+await builder.Build().RunAsync();

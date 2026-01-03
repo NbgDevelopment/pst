@@ -1,0 +1,10 @@
+@using NbgDev.Pst.Web.Services
+@inject TokenExpirationService TokenExpirationService
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Clear expired tokens when the app initializes
+        await TokenExpirationService.ClearExpiredTokensAsync();
+    }
+}
