@@ -40,6 +40,50 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return Map(project);
     }
 
+    public async Task<IReadOnlyList<ProjectMember>> GetProjectMembers(Guid projectId)
+    {
+        var tableClient = await GetTableClient();
+
+        var partitionKey = ProjectMemberEntity.EntityPartitionKeyPrefix + projectId;
+        var members = tableClient.Query<ProjectMemberEntity>(e => e.PartitionKey == partitionKey);
+
+        return members.Select(MapMember).ToArray();
+    }
+
+    public async Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string email)
+    {
+        var member = new ProjectMemberEntity
+        {
+            ProjectId = projectId,
+            UserId = userId,
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email
+        };
+
+        var tableClient = await GetTableClient();
+        await tableClient.UpsertEntityAsync(member);
+
+        return MapMember(member);
+    }
+
+    public async Task<bool> RemoveProjectMember(Guid projectId, string userId)
+    {
+        var tableClient = await GetTableClient();
+        var partitionKey = ProjectMemberEntity.EntityPartitionKeyPrefix + projectId;
+
+        try
+        {
+            await tableClient.DeleteEntityAsync(partitionKey, userId);
+            return true;
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            // Entity doesn't exist
+            return false;
+        }
+    }
+
     private async Task<TableClient> GetTableClient()
     {
         var table = await tableServiceClient.CreateTableIfNotExistsAsync("Projects");
@@ -55,6 +99,18 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
             Id = project.Id,
             Name = project.Name,
             ShortName = project.ShortName
+        };
+    }
+
+    private static ProjectMember MapMember(ProjectMemberEntity member)
+    {
+        return new ProjectMember
+        {
+            ProjectId = member.ProjectId,
+            UserId = member.UserId,
+            FirstName = member.FirstName,
+            LastName = member.LastName,
+            Email = member.Email
         };
     }
 }

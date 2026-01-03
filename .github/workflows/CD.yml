@@ -135,6 +135,10 @@ jobs:
         -var 'image_processing=${{ env.REGISTRY }}/nbgdevelopment/pst-processing:${{ needs.build.outputs.imageTag }}'
         -var 'registry_username=${{ vars.REGISTRY_USERNAME }}'
         -var 'registry_password=${{ secrets.REGISTRY_PASSWORD }}'
+        -var 'azure_ad_tenant_id=${{ secrets.AZURE_AD_TENANT_ID }}'
+        -var 'azure_ad_client_id=${{ secrets.AZURE_AD_CLIENT_ID }}'
+        -var 'azure_ad_client_secret=${{ secrets.AZURE_AD_CLIENT_SECRET }}'
+        -var 'azure_ad_audience=${{ secrets.AZURE_AD_AUDIENCE }}'
         -auto-approve
       working-directory: ./src/.azure
       env:

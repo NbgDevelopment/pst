@@ -15,6 +15,8 @@ public static class Bootstrap
         services.AddPstApiClient(configuration);
 
         services.AddScoped<IProjectService, ProjectService>();
+        services.AddScoped<IProjectMemberService, ProjectMemberService>();
+        services.AddScoped<IEntraIdService, EntraIdService>();
 
         return services;
     }
