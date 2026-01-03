@@ -5,10 +5,11 @@ namespace NbgDev.Pst.Web.Services;
 /// <summary>
 /// Service that checks for expired tokens in localStorage and clears them on application startup.
 /// </summary>
-public class TokenExpirationService
+public class TokenExpirationService : IAsyncDisposable
 {
     private readonly IJSRuntime _jsRuntime;
     private IJSObjectReference? _module;
+    private bool _moduleLoaded;
 
     public TokenExpirationService(IJSRuntime jsRuntime)
     {
@@ -23,12 +24,19 @@ public class TokenExpirationService
     {
         try
         {
-            // Import the JavaScript module
-            _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./js/tokenExpiration.js");
+            // Import the JavaScript module only once
+            if (!_moduleLoaded)
+            {
+                _module = await _jsRuntime.InvokeAsync<IJSObjectReference>(
+                    "import", "./js/tokenExpiration.js");
+                _moduleLoaded = true;
+            }
             
             // Call the function to clear expired tokens
-            await _module.InvokeVoidAsync("clearExpiredMsalTokens");
+            if (_module is not null)
+            {
+                await _module.InvokeVoidAsync("clearExpiredMsalTokens");
+            }
         }
         catch (Exception ex)
         {

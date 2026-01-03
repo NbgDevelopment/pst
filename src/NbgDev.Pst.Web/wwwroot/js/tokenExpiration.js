@@ -26,7 +26,8 @@ export function clearExpiredMsalTokens() {
                         
                         // Check if this entry has an expiration time
                         // MSAL stores different types of data; we're looking for tokens with expiration
-                        if (parsed.secret || parsed.credentialType === 'AccessToken' || parsed.credentialType === 'IdToken') {
+                        const tokenTypes = ['AccessToken', 'IdToken'];
+                        if (parsed.secret || tokenTypes.includes(parsed.credentialType)) {
                             // Check for expiration in various formats MSAL might use
                             let expirationTime = null;
                             
@@ -68,7 +69,7 @@ export function clearExpiredMsalTokens() {
                 localStorage.removeItem(key);
             });
             
-            console.log('Cleared ' + keysToRemove.length + ' expired MSAL cache entries from localStorage');
+            console.log(`Cleared ${keysToRemove.length} expired MSAL cache entries from localStorage`);
         }
         
         return true;
