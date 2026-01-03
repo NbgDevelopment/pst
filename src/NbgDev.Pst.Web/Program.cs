@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using NbgDev.Pst.App;
 using NbgDev.Pst.Web;
+using NbgDev.Pst.Web.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -23,6 +24,9 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 builder.Services.AddApp(builder.Configuration);
+
+// Register token expiration service
+builder.Services.AddScoped<TokenExpirationService>();
 
 builder.Services.AddMsalAuthentication(options =>
 {
