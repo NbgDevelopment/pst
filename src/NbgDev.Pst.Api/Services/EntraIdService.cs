@@ -16,11 +16,9 @@ public class EntraIdService(GraphServiceClient graphClient) : IEntraIdService
         var users = await graphClient.Users
             .GetAsync(requestConfiguration =>
             {
-                // ConsistencyLevel header is added by GraphConsistencyLevelHandler
-                requestConfiguration.QueryParameters.Search = $"\"displayName:{searchTerm}\" OR \"mail:{searchTerm}\" OR \"userPrincipalName:{searchTerm}\"";
+                requestConfiguration.QueryParameters.Filter = $"startsWith(givenName, '{searchTerm}') or startsWith(surname, '{searchTerm}') or startsWith(mail, '{searchTerm}')";
                 requestConfiguration.QueryParameters.Select = new[] { "id", "displayName", "givenName", "surname", "mail" };
                 requestConfiguration.QueryParameters.Top = 20;
-                requestConfiguration.QueryParameters.Count = true;
             });
 
         return users?.Value?
