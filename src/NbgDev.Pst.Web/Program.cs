@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using NbgDev.Pst.App;
 using NbgDev.Pst.Web;
+using NbgDev.Pst.Web.Services;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -24,6 +25,9 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 
 builder.Services.AddApp(builder.Configuration);
 
+// Register token expiration service
+builder.Services.AddScoped<TokenExpirationService>();
+
 builder.Services.AddMsalAuthentication(options =>
 {
     builder.Configuration.Bind("AzureAd", options.ProviderOptions.Authentication);
@@ -41,4 +45,10 @@ builder.Services.AddMsalAuthentication(options =>
     options.ProviderOptions.Cache.CacheLocation = "localStorage";
 });
 
-await builder.Build().RunAsync();
+var host = builder.Build();
+
+// Clear expired tokens before running the app
+var tokenExpirationService = host.Services.GetRequiredService<TokenExpirationService>();
+await tokenExpirationService.ClearExpiredTokensAsync();
+
+await host.RunAsync();
