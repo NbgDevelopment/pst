@@ -87,7 +87,8 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
             group = new GroupInfoDto
             {
                 Id = project.Group.Id,
-                Name = project.Group.Name
+                Name = project.Group.Name,
+                AssignedRoleIds = project.Group.AssignedRoleIds
             };
         }
 

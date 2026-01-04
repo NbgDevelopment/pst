@@ -7,4 +7,6 @@ public interface IEntraIdGroupService
     Task RemoveMemberFromGroupAsync(string groupId, string userId, CancellationToken cancellationToken = default);
     Task DeleteGroupAsync(string groupId, CancellationToken cancellationToken = default);
     Task<string?> GetGroupIdForProjectAsync(Guid projectId, CancellationToken cancellationToken = default);
+    Task AssignGroupToRoleAsync(string groupId, string roleId, CancellationToken cancellationToken = default);
+    Task RemoveGroupFromRoleAsync(string groupId, string roleId, CancellationToken cancellationToken = default);
 }
