@@ -63,7 +63,7 @@ public class EventProcessor(
                             var handler = eventHandlers.FirstOrDefault(h => h.CanHandle(eventType));
                             if (handler == null)
                             {
-                                logger.LogWarning("No handler found for event type {EventType}", eventType);
+                                logger.LogInformation("No handler found for event type {EventType}. Message: {Message}", eventType, message.MessageText);
                                 await processingQueue.DeleteMessageAsync(message.MessageId, message.PopReceipt, stoppingToken);
                                 continue;
                             }
@@ -73,6 +73,10 @@ public class EventProcessor(
                             {
                                 nameof(Events.Contract.Models.ProjectCreatedProcessedEvent) => 
                                     JsonSerializer.Deserialize<Events.Contract.Models.ProjectCreatedProcessedEvent>(message.MessageText),
+                                nameof(Events.Contract.Models.ProjectMemberAddedEvent) => 
+                                    JsonSerializer.Deserialize<Events.Contract.Models.ProjectMemberAddedEvent>(message.MessageText),
+                                nameof(Events.Contract.Models.ProjectMemberRemovedEvent) => 
+                                    JsonSerializer.Deserialize<Events.Contract.Models.ProjectMemberRemovedEvent>(message.MessageText),
                                 _ => null
                             };
 
