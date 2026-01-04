@@ -632,6 +632,181 @@ These secrets are automatically used by the CD workflow to configure the Azure C
 - The `AZURE_AD_*` secrets configure the API application itself for authenticating to Microsoft Graph
 - Rotate the `AZURE_AD_CLIENT_SECRET` before it expires (you'll need to generate a new one in Azure AD and update the GitHub secret)
 
+## 8. Configure Entra ID API Permissions for Project Group Management
+
+The Project Setup Tool automatically manages Entra ID security groups for projects. When a project is created, a corresponding security group is created in Entra ID. Members added to projects are automatically added to these groups, and the groups are deleted when projects are deleted.
+
+### Processing App Registration
+
+The Processing application (which handles background events) needs its own App Registration with permissions to manage groups.
+
+#### Create Processing App Registration
+
+##### Using Azure Portal
+
+1. Navigate to **Azure Active Directory** > **App registrations**
+2. Click **New registration**
+3. Enter the following details:
+   - **Name**: `pst-processing` (or your preferred name)
+   - **Supported account types**: Accounts in this organizational directory only
+   - **Redirect URI**: Leave blank
+4. Click **Register**
+5. Note down the **Application (client) ID** and **Directory (tenant) ID**
+
+##### Using Azure CLI
+
+```bash
+# Create the app registration for the Processing app
+az ad app create --display-name "pst-processing"
+
+# Note the appId and copy it for the next step
+PROCESSING_APP_ID="<your-processing-app-id>"
+
+# Create a service principal for the app
+az ad sp create --id $PROCESSING_APP_ID
+```
+
+### Grant Microsoft Graph Permissions
+
+The Processing app needs the following permissions to manage groups:
+
+- `Group.ReadWrite.All` - To create, update, and delete groups
+- `GroupMember.ReadWrite.All` - To add and remove group members
+
+#### Using Azure Portal
+
+1. Navigate to your Processing App Registration (`pst-processing`)
+2. Go to **API permissions**
+3. Click **Add a permission**
+4. Select **Microsoft Graph**
+5. Choose **Application permissions** (not Delegated)
+6. Search for and select the following permissions:
+   - **Group.ReadWrite.All**
+   - **GroupMember.ReadWrite.All**
+7. Click **Add permissions**
+8. Click **Grant admin consent for [Your Organization]** (requires admin privileges)
+   - This step is critical - without admin consent, the Processing app won't be able to manage groups
+
+#### Using Azure CLI
+
+```bash
+# Set variables
+PROCESSING_APP_ID="<your-processing-app-id>"
+
+# Add the Group.ReadWrite.All application permission
+# The permission ID for Group.ReadWrite.All is 62a82d76-70ea-41e2-9197-370581804d09
+az ad app permission add \
+  --id $PROCESSING_APP_ID \
+  --api 00000003-0000-0000-c000-000000000000 \
+  --api-permissions 62a82d76-70ea-41e2-9197-370581804d09=Role
+
+# Add the GroupMember.ReadWrite.All application permission
+# The permission ID for GroupMember.ReadWrite.All is dbaae8cf-10b5-4b86-a4a1-f871c94c6695
+az ad app permission add \
+  --id $PROCESSING_APP_ID \
+  --api 00000003-0000-0000-c000-000000000000 \
+  --api-permissions dbaae8cf-10b5-4b86-a4a1-f871c94c6695=Role
+
+# Grant admin consent for the permissions
+az ad app permission admin-consent --id $PROCESSING_APP_ID
+```
+
+### Create a Client Secret
+
+The Processing app needs credentials to authenticate to Microsoft Graph.
+
+#### Using Azure Portal
+
+1. In your Processing App Registration, go to **Certificates & secrets**
+2. Click **New client secret**
+3. Enter a description (e.g., "Processing App Microsoft Graph Access")
+4. Select an expiration period (recommended: 24 months or less)
+5. Click **Add**
+6. **Copy the secret value immediately** - it won't be shown again
+7. Add this secret to your application configuration
+
+#### Using Azure CLI
+
+```bash
+# Create a client secret (expires in 2 years)
+az ad app credential reset --id $PROCESSING_APP_ID --years 2
+```
+
+### Configuration
+
+#### Manual Deployment (Local Development)
+
+For local development, use User Secrets:
+
+```bash
+cd src/NbgDev.Pst.Processing
+dotnet user-secrets set "AzureAd:TenantId" "<your-tenant-id>"
+dotnet user-secrets set "AzureAd:ClientId" "<your-processing-app-id>"
+dotnet user-secrets set "AzureAd:ClientSecret" "<your-processing-client-secret>"
+dotnet user-secrets set "Stage" "Debug"
+```
+
+#### Terraform Deployment
+
+For automated deployments, the Processing app Azure AD configuration is managed via Terraform.
+
+1. **Update your Terraform variables** (in `terraform.tfvars` or via GitHub Secrets):
+   - `processing_azure_ad_tenant_id` - Your Azure AD tenant ID
+   - `processing_azure_ad_client_id` - Your Processing App Registration client ID
+   - `processing_azure_ad_client_secret` - Your Processing App Registration client secret
+
+2. **Add GitHub Secrets** for CI/CD (in addition to the existing secrets):
+   - `PROCESSING_AZURE_AD_TENANT_ID` - Your Azure AD tenant ID (same as above)
+   - `PROCESSING_AZURE_AD_CLIENT_ID` - Your Processing App Registration client ID
+   - `PROCESSING_AZURE_AD_CLIENT_SECRET` - Your Processing App Registration client secret
+
+3. **Update the Terraform module** to pass these variables to the Processing container app (this should already be configured in the infrastructure code)
+
+### Group Naming Convention
+
+Groups are created with the following naming convention:
+
+- **Production/Prod environments**: `PST - {ProjectName}`
+  - Example: `PST - Customer Portal`
+  - Mail nickname: `pst-{shortname}`
+  - Example mail nickname: `pst-custportal`
+
+- **Non-production environments**: `PST - {ProjectName} ({Stage})`
+  - Example: `PST - Customer Portal (dev)`
+  - Mail nickname: `pst-{shortname}-{stage}`
+  - Example mail nickname: `pst-custportal-dev`
+
+- **Debug/Local development**: Groups are created with "Debug" stage if the Stage configuration is not set
+  - Example: `PST - Customer Portal (Debug)`
+  - Mail nickname: `pst-custportal-debug`
+
+### Security Best Practices
+
+- **Minimize Permissions**: Only grant the minimum permissions needed (Group.ReadWrite.All and GroupMember.ReadWrite.All)
+- **Rotate Secrets**: Rotate client secrets regularly before they expire
+- **Monitor Usage**: Review the Processing app's Microsoft Graph usage regularly through Azure AD audit logs
+- **Conditional Access**: Consider applying Conditional Access policies to the Processing app's service principal
+- **Separate App Registrations**: Keep separate app registrations for API and Processing apps for better security isolation
+
+### Troubleshooting
+
+**Error: "Insufficient privileges to complete the operation"**
+- Ensure admin consent has been granted for both `Group.ReadWrite.All` and `GroupMember.ReadWrite.All` permissions
+- Verify the Processing App Registration has the correct permissions assigned
+
+**Error: "AADSTS7000215: Invalid client secret"**
+- The client secret may have expired or is incorrect
+- Generate a new client secret and update your configuration
+
+**Groups not being created**
+- Check the Processing app logs for errors
+- Verify the AzureAd configuration is correctly set in the Processing app
+- Ensure the Stage configuration is set (defaults to "Debug" if not set)
+
+**Groups created with wrong names**
+- Verify the Stage environment variable is correctly set in your deployment
+- For production, ensure Stage is set to "Production" or "Prod" to avoid stage suffix in group names
+
 ## Resources
 
 - [Azure Federated Identity Credentials](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation)
@@ -639,3 +814,4 @@ These secrets are automatically used by the CD workflow to configure the Azure C
 - [Azure Login GitHub Action](https://github.com/Azure/login)
 - [Terraform Azure Backend](https://developer.hashicorp.com/terraform/language/settings/backends/azurerm)
 - [Microsoft Graph Permissions Reference](https://learn.microsoft.com/en-us/graph/permissions-reference)
+- [Microsoft Graph Groups API](https://learn.microsoft.com/en-us/graph/api/resources/group)

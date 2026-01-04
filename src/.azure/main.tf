@@ -60,6 +60,9 @@ module "processing" {
   connectionstring_queues          = module.storage.primary_queue_connectionstring
   registry_username                = var.registry_username
   registry_password                = var.registry_password
+  azure_ad_tenant_id               = var.azure_ad_tenant_id
+  azure_ad_client_id               = var.processing_azure_ad_client_id
+  azure_ad_client_secret           = var.processing_azure_ad_client_secret
 }
 
 module "web" {
