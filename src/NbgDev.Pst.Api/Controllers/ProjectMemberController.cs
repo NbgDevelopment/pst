@@ -58,6 +58,8 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
     }
 
     [HttpDelete("{userId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> RemoveMember(Guid projectId, string userId)
     {
         var removed = await mediator.Send(new RemoveProjectMemberRequest(projectId, userId));
