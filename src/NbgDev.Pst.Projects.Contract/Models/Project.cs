@@ -8,5 +8,5 @@ public class Project
 
     public required string ShortName { get; set; }
 
-    public string? GroupId { get; set; }
+    public GroupInfo? Group { get; set; }
 }

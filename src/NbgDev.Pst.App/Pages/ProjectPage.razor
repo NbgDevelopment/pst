@@ -19,6 +19,20 @@ else
         <MudTabPanel Text="Members">
             <MembersPanel ProjectId="@Id" />
         </MudTabPanel>
+        <MudTabPanel Text="Permissions">
+            <div class="pa-4">
+                @if (Project.Group != null)
+                {
+                    <MudText Typo="Typo.h6" Class="mb-2">EntraId Security Group</MudText>
+                    <MudText><strong>Group Name:</strong> @Project.Group.Name</MudText>
+                    <MudText><strong>Group ID:</strong> @Project.Group.Id</MudText>
+                }
+                else
+                {
+                    <MudText>No security group has been created yet for this project.</MudText>
+                }
+            </div>
+        </MudTabPanel>
         <MudTabPanel Text="Settings">
             <div class="pa-4">
                 <MudText>Project settings will be here.</MudText>

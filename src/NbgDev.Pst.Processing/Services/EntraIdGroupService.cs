@@ -8,7 +8,7 @@ public class EntraIdGroupService(
     IConfiguration configuration,
     ILogger<EntraIdGroupService> logger) : IEntraIdGroupService
 {
-    public async Task<string> CreateGroupForProjectAsync(
+    public async Task<(string GroupId, string GroupName)> CreateGroupForProjectAsync(
         Guid projectId,
         string projectName,
         string shortName,
@@ -27,7 +27,7 @@ public class EntraIdGroupService(
         var group = new Group
         {
             DisplayName = groupDisplayName,
-            Description = $"Members of project {projectName} (Project ID: {projectId})",
+            Description = $"Members of project (Project ID: {projectId})",
             MailEnabled = false,
             MailNickname = groupMailNickname,
             SecurityEnabled = true,
@@ -46,7 +46,7 @@ public class EntraIdGroupService(
             createdGroup.Id,
             projectId);
 
-        return createdGroup.Id;
+        return (createdGroup.Id, groupDisplayName);
     }
 
     public async Task AddMemberToGroupAsync(
@@ -116,8 +116,8 @@ public class EntraIdGroupService(
         var groups = await graphClient.Groups
             .GetAsync(requestConfiguration =>
             {
-                requestConfiguration.QueryParameters.Filter = $"contains(description, 'Project ID: {projectId}')";
-                requestConfiguration.QueryParameters.Select = new[] { "id" };
+                requestConfiguration.QueryParameters.Filter = $"description eq 'Members of project (Project ID: {projectId})'";
+                requestConfiguration.QueryParameters.Select = new[] { "id", "displayName" };
                 requestConfiguration.QueryParameters.Top = 1;
             }, cancellationToken: cancellationToken);
 
@@ -159,10 +159,10 @@ public class EntraIdGroupService(
         if (string.Equals(stage, "Production", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(stage, "Prod", StringComparison.OrdinalIgnoreCase))
         {
-            return $"PST - {projectName}";
+            return projectName;
         }
 
-        return $"PST - {projectName} ({stage})";
+        return $"{projectName} ({stage})";
     }
 
     private static string BuildGroupMailNickname(string shortName, string stage)
@@ -182,7 +182,7 @@ public class EntraIdGroupService(
         if (string.Equals(stage, "Production", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(stage, "Prod", StringComparison.OrdinalIgnoreCase))
         {
-            return $"pst-{sanitizedShortName}".ToLowerInvariant();
+            return sanitizedShortName.ToLowerInvariant();
         }
 
         // Sanitize stage name as well
@@ -196,6 +196,6 @@ public class EntraIdGroupService(
             sanitizedStage = "env";
         }
 
-        return $"pst-{sanitizedShortName}-{sanitizedStage}".ToLowerInvariant();
+        return $"{sanitizedShortName}-{sanitizedStage}".ToLowerInvariant();
     }
 }

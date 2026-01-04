@@ -1,6 +1,7 @@
 using MediatR;
 using NbgDev.Pst.Events.Contract.Base;
 using NbgDev.Pst.Events.Contract.Models;
+using NbgDev.Pst.Projects.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Requests;
 
 namespace NbgDev.Pst.Api.Services.EventHandlers;
@@ -21,30 +22,39 @@ public class ProjectCreatedProcessedEventHandler(
         }
 
         logger.LogInformation(
-            "Received project created processed event for project {ProjectId}. Success: {Success}, Message: {Message}, GroupId: {GroupId}",
+            "Received project created processed event for project {ProjectId}. Success: {Success}, Message: {Message}, GroupId: {GroupId}, GroupName: {GroupName}",
             processedEvent.ProjectId,
             processedEvent.Success,
             processedEvent.Message,
-            processedEvent.GroupId);
+            processedEvent.GroupId,
+            processedEvent.GroupName);
 
-        if (processedEvent.Success && !string.IsNullOrEmpty(processedEvent.GroupId))
+        if (processedEvent.Success && !string.IsNullOrEmpty(processedEvent.GroupId) && !string.IsNullOrEmpty(processedEvent.GroupName))
         {
             try
             {
-                await mediator.Send(new UpdateProjectGroupIdRequest(
+                var groupInfo = new GroupInfo
+                {
+                    Id = processedEvent.GroupId,
+                    Name = processedEvent.GroupName
+                };
+
+                await mediator.Send(new UpdateProjectGroupRequest(
                     processedEvent.ProjectId,
-                    processedEvent.GroupId), cancellationToken);
+                    groupInfo), cancellationToken);
 
                 logger.LogInformation(
-                    "Updated project {ProjectId} with GroupId {GroupId}",
+                    "Updated project {ProjectId} with Group {GroupName} ({GroupId})",
                     processedEvent.ProjectId,
+                    processedEvent.GroupName,
                     processedEvent.GroupId);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, 
-                    "Failed to update project {ProjectId} with GroupId {GroupId}",
+                    "Failed to update project {ProjectId} with Group {GroupName} ({GroupId})",
                     processedEvent.ProjectId,
+                    processedEvent.GroupName,
                     processedEvent.GroupId);
             }
         }

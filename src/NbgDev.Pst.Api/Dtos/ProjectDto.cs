@@ -8,5 +8,5 @@ public class ProjectDto
 
     public required string ShortName { get; set; }
 
-    public string? GroupId { get; set; }
+    public GroupInfoDto? Group { get; set; }
 }

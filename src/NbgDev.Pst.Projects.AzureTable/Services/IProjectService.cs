@@ -10,7 +10,7 @@ internal interface IProjectService
 
     Task<Project> CreateProject(string name, string shortName);
 
-    Task UpdateProjectGroupId(Guid projectId, string groupId);
+    Task UpdateProjectGroup(Guid projectId, GroupInfo group);
 
     Task<bool> DeleteProject(Guid projectId);
 

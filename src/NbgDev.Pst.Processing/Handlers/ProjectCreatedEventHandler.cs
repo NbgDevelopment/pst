@@ -29,7 +29,7 @@ public class ProjectCreatedEventHandler(
         try
         {
             // Create EntraId group for the project
-            var groupId = await entraIdGroupService.CreateGroupForProjectAsync(
+            var (groupId, groupName) = await entraIdGroupService.CreateGroupForProjectAsync(
                 projectCreatedEvent.ProjectId,
                 projectCreatedEvent.ProjectName,
                 projectCreatedEvent.ShortName,
@@ -42,7 +42,8 @@ public class ProjectCreatedEventHandler(
                 ProjectId = projectCreatedEvent.ProjectId,
                 Success = true,
                 Message = "Project creation processed successfully",
-                GroupId = groupId
+                GroupId = groupId,
+                GroupName = groupName
             };
 
             await eventPublisher.PublishAsync(processedEvent, cancellationToken);

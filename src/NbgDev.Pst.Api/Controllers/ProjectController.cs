@@ -81,12 +81,22 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
 
     private static ProjectDto Map(Project project)
     {
+        GroupInfoDto? group = null;
+        if (project.Group != null)
+        {
+            group = new GroupInfoDto
+            {
+                Id = project.Group.Id,
+                Name = project.Group.Name
+            };
+        }
+
         return new ProjectDto
         {
             Id = project.Id,
             Name = project.Name,
             ShortName = project.ShortName,
-            GroupId = project.GroupId
+            Group = group
         };
     }
 }

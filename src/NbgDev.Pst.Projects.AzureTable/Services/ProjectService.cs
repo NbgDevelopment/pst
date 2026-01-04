@@ -1,6 +1,7 @@
 ﻿using Azure.Data.Tables;
 using NbgDev.Pst.Projects.AzureTable.Entities;
 using NbgDev.Pst.Projects.Contract.Models;
+using System.Text.Json;
 
 namespace NbgDev.Pst.Projects.AzureTable.Services;
 
@@ -40,7 +41,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return Map(project);
     }
 
-    public async Task UpdateProjectGroupId(Guid projectId, string groupId)
+    public async Task UpdateProjectGroup(Guid projectId, GroupInfo group)
     {
         var tableClient = await GetTableClient();
 
@@ -48,11 +49,11 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         
         if (!project.HasValue)
         {
-            throw new InvalidOperationException($"Failed to update GroupId: Project {projectId} not found");
+            throw new InvalidOperationException($"Failed to update Group: Project {projectId} not found");
         }
 
         var projectEntity = project.Value;
-        projectEntity.GroupId = groupId;
+        projectEntity.GroupJson = JsonSerializer.Serialize(group);
 
         await tableClient.UpdateEntityAsync(projectEntity, projectEntity.ETag);
     }
@@ -138,12 +139,25 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
 
     private static Project Map(ProjectEntity project)
     {
+        GroupInfo? group = null;
+        if (!string.IsNullOrEmpty(project.GroupJson))
+        {
+            try
+            {
+                group = JsonSerializer.Deserialize<GroupInfo>(project.GroupJson);
+            }
+            catch (JsonException)
+            {
+                // If deserialization fails, group remains null
+            }
+        }
+
         return new Project
         {
             Id = project.Id,
             Name = project.Name,
             ShortName = project.ShortName,
-            GroupId = project.GroupId
+            Group = group
         };
     }
 
