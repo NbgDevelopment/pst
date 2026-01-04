@@ -51,3 +51,14 @@ variable "azure_ad_audience" {
   type        = string
   description = "Azure AD Audience (API identifier URI)"
 }
+
+variable "processing_azure_ad_client_id" {
+  type        = string
+  description = "Azure AD Client ID (App Registration) for the Processing app"
+}
+
+variable "processing_azure_ad_client_secret" {
+  type        = string
+  sensitive   = true
+  description = "Azure AD Client Secret for the Processing app to authenticate to Microsoft Graph"
+}

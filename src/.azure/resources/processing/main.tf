@@ -29,6 +29,22 @@ resource "azurerm_container_app" "processing" {
         name  = "ASPNETCORE_ENVIRONMENT"
         value = var.stage == "dev" ? "Development" : var.stage == "debug" ? "Development" : "Production"
       }
+      env {
+        name  = "AzureAd__TenantId"
+        value = var.azure_ad_tenant_id
+      }
+      env {
+        name  = "AzureAd__ClientId"
+        value = var.azure_ad_client_id
+      }
+      env {
+        name        = "AzureAd__ClientSecret"
+        secret_name = "azure-ad-client-secret"
+      }
+      env {
+        name  = "Stage"
+        value = var.stage
+      }
     }
   }
 
@@ -40,6 +56,11 @@ resource "azurerm_container_app" "processing" {
   secret {
     name  = "connectionstring-queues"
     value = var.connectionstring_queues
+  }
+
+  secret {
+    name  = "azure-ad-client-secret"
+    value = var.azure_ad_client_secret
   }
 
   registry {

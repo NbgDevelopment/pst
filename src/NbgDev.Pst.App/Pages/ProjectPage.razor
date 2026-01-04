@@ -19,9 +19,29 @@ else
         <MudTabPanel Text="Members">
             <MembersPanel ProjectId="@Id" />
         </MudTabPanel>
+        <MudTabPanel Text="Permissions">
+            <div class="pa-4">
+                @if (Project.Group != null)
+                {
+                    <MudText Typo="Typo.h6" Class="mb-2">Project Security Group</MudText>
+                    <MudText><strong>Group Name:</strong> @Project.Group.Name</MudText>
+                    <MudText><strong>Group ID:</strong> @Project.Group.Id</MudText>
+                }
+                else
+                {
+                    <MudText>No security group has been created yet for this project.</MudText>
+                }
+            </div>
+        </MudTabPanel>
         <MudTabPanel Text="Settings">
             <div class="pa-4">
-                <MudText>Project settings will be here.</MudText>
+                <MudText Typo="Typo.h6" Class="mb-4">Danger Zone</MudText>
+                <MudButton Color="Color.Error" 
+                           Variant="Variant.Filled" 
+                           OnClick="OpenDeleteDialog"
+                           StartIcon="@Icons.Material.Filled.Delete">
+                    Delete Project
+                </MudButton>
             </div>
         </MudTabPanel>
     </MudTabs>
@@ -30,3 +50,32 @@ else
         <MudButton OnClick="GoHome">Go home</MudButton>
     </div>
 }
+
+<MudDialog @bind-Visible="deleteDialogVisible" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Warning" Class="mr-3" Color="Color.Warning" /> Confirm Deletion
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Are you sure you want to delete the project <strong>@Project?.Name</strong>?</MudText>
+        <MudText Class="mt-2">This action cannot be undone. The project and its associated security group will be permanently deleted.</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseDeleteDialog" Disabled="@isDeleting">Cancel</MudButton>
+        <MudButton Color="Color.Error" 
+                   Variant="Variant.Filled" 
+                   OnClick="DeleteProject"
+                   Disabled="@isDeleting">
+            @if (isDeleting)
+            {
+                <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                <span>Deleting...</span>
+            }
+            else
+            {
+                <span>Delete</span>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>

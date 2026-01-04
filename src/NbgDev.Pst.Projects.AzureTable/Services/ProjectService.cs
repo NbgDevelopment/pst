@@ -1,11 +1,18 @@
 ﻿using Azure.Data.Tables;
 using NbgDev.Pst.Projects.AzureTable.Entities;
 using NbgDev.Pst.Projects.Contract.Models;
+using System.Text.Json;
 
 namespace NbgDev.Pst.Projects.AzureTable.Services;
 
 internal class ProjectService(TableServiceClient tableServiceClient) : IProjectService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = false
+    };
+
     public async Task<IReadOnlyList<Project>> GetProjects()
     {
         var tableClient = await GetTableClient();
@@ -38,6 +45,50 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         await tableClient.AddEntityAsync(project);
 
         return Map(project);
+    }
+
+    public async Task UpdateProjectGroup(Guid projectId, GroupInfo group)
+    {
+        var tableClient = await GetTableClient();
+
+        var project = await tableClient.GetEntityAsync<ProjectEntity>(ProjectEntity.EntityPartitionKey, projectId.ToString());
+        
+        if (!project.HasValue)
+        {
+            throw new InvalidOperationException($"Failed to update Group: Project {projectId} not found");
+        }
+
+        var projectEntity = project.Value;
+        projectEntity.GroupJson = JsonSerializer.Serialize(group, JsonOptions);
+
+        await tableClient.UpdateEntityAsync(projectEntity, projectEntity.ETag);
+    }
+
+    public async Task<bool> DeleteProject(Guid projectId)
+    {
+        var tableClient = await GetTableClient();
+
+        try
+        {
+            // Delete the project
+            await tableClient.DeleteEntityAsync(ProjectEntity.EntityPartitionKey, projectId.ToString());
+
+            // Delete all members of the project
+            var partitionKey = $"{ProjectMemberEntity.EntityPartitionKeyPrefix}{projectId}";
+            var members = tableClient.Query<ProjectMemberEntity>(e => e.PartitionKey == partitionKey);
+
+            foreach (var member in members)
+            {
+                await tableClient.DeleteEntityAsync(partitionKey, member.UserId);
+            }
+
+            return true;
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            // Entity doesn't exist
+            return false;
+        }
     }
 
     public async Task<IReadOnlyList<ProjectMember>> GetProjectMembers(Guid projectId)
@@ -94,11 +145,25 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
 
     private static Project Map(ProjectEntity project)
     {
+        GroupInfo? group = null;
+        if (!string.IsNullOrEmpty(project.GroupJson))
+        {
+            try
+            {
+                group = JsonSerializer.Deserialize<GroupInfo>(project.GroupJson, JsonOptions);
+            }
+            catch (JsonException)
+            {
+                // If deserialization fails, group remains null
+            }
+        }
+
         return new Project
         {
             Id = project.Id,
             Name = project.Name,
-            ShortName = project.ShortName
+            ShortName = project.ShortName,
+            Group = group
         };
     }
 

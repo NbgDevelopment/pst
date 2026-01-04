@@ -42,13 +42,29 @@ public class ProjectService(IProjectClient projectClient) : IProjectService
         return created;
     }
 
+    public async Task DeleteProject(Guid id)
+    {
+        await projectClient.DeleteAsync(id);
+    }
+
     private Project Map(ProjectDto source)
     {
+        GroupInfo? group = null;
+        if (source.Group != null)
+        {
+            group = new GroupInfo
+            {
+                Id = source.Group.Id,
+                Name = source.Group.Name
+            };
+        }
+
         return new()
         {
             Id = source.Id,
             Name = source.Name,
-            ShortName = source.ShortName
+            ShortName = source.ShortName,
+            Group = group
         };
     }
 }

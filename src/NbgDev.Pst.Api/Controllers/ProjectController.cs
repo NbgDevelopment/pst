@@ -60,13 +60,49 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
         return Ok(Map(project));
     }
 
+    [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        // Get project to retrieve GroupId before deletion
+        var project = await mediator.Send(new GetProjectRequest(id));
+        
+        var deleted = await mediator.Send(new DeleteProjectRequest(id));
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        await eventPublisher.PublishAsync(new ProjectDeletedEvent
+        {
+            EventType = nameof(ProjectDeletedEvent),
+            ProjectId = id,
+            GroupId = project?.Group?.Id
+        });
+
+        return NoContent();
+    }
+
     private static ProjectDto Map(Project project)
     {
+        GroupInfoDto? group = null;
+        if (project.Group != null)
+        {
+            group = new GroupInfoDto
+            {
+                Id = project.Group.Id,
+                Name = project.Group.Name
+            };
+        }
+
         return new ProjectDto
         {
             Id = project.Id,
             Name = project.Name,
-            ShortName = project.ShortName
+            ShortName = project.ShortName,
+            Group = group
         };
     }
 }

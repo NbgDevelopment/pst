@@ -40,6 +40,9 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
             dto.Email
         ));
 
+        // Get project to retrieve GroupId
+        var project = await mediator.Send(new GetProjectRequest(projectId));
+
         await eventPublisher.PublishAsync(new ProjectMemberAddedEvent
         {
             EventType = nameof(ProjectMemberAddedEvent),
@@ -47,13 +50,16 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
             UserId = member.UserId,
             FirstName = member.FirstName,
             LastName = member.LastName,
-            Email = member.Email
+            Email = member.Email,
+            GroupId = project?.Group?.Id
         });
 
         return Ok(Map(member));
     }
 
     [HttpDelete("{userId}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> RemoveMember(Guid projectId, string userId)
     {
         var removed = await mediator.Send(new RemoveProjectMemberRequest(projectId, userId));
@@ -63,11 +69,15 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
             return NotFound();
         }
 
+        // Get project to retrieve GroupId
+        var project = await mediator.Send(new GetProjectRequest(projectId));
+
         await eventPublisher.PublishAsync(new ProjectMemberRemovedEvent
         {
             EventType = nameof(ProjectMemberRemovedEvent),
             ProjectId = projectId,
-            UserId = userId
+            UserId = userId,
+            GroupId = project?.Group?.Id
         });
 
         return NoContent();

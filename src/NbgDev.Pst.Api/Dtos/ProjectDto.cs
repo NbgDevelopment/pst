@@ -7,4 +7,6 @@ public class ProjectDto
     public required string Name { get; set; }
 
     public required string ShortName { get; set; }
+
+    public GroupInfoDto? Group { get; set; }
 }

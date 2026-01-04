@@ -10,6 +10,10 @@ internal interface IProjectService
 
     Task<Project> CreateProject(string name, string shortName);
 
+    Task UpdateProjectGroup(Guid projectId, GroupInfo group);
+
+    Task<bool> DeleteProject(Guid projectId);
+
     Task<IReadOnlyList<ProjectMember>> GetProjectMembers(Guid projectId);
 
     Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string email);

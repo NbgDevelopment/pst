@@ -5,6 +5,7 @@ using NbgDev.Pst.Processing.Services;
 namespace NbgDev.Pst.Processing.Handlers;
 
 public class ProjectCreatedEventHandler(
+    IEntraIdGroupService entraIdGroupService,
     IEventPublisher eventPublisher,
     ILogger<ProjectCreatedEventHandler> logger) : IEventHandler
 {
@@ -25,19 +26,45 @@ public class ProjectCreatedEventHandler(
             projectCreatedEvent.ProjectName,
             projectCreatedEvent.ShortName);
 
-        // Send confirmation event
-        var processedEvent = new ProjectCreatedProcessedEvent
+        try
         {
-            EventType = nameof(ProjectCreatedProcessedEvent),
-            ProjectId = projectCreatedEvent.ProjectId,
-            Success = true,
-            Message = "Project creation processed successfully"
-        };
+            // Create EntraId group for the project
+            var (groupId, groupName) = await entraIdGroupService.CreateGroupForProjectAsync(
+                projectCreatedEvent.ProjectId,
+                projectCreatedEvent.ProjectName,
+                projectCreatedEvent.ShortName,
+                cancellationToken);
 
-        await eventPublisher.PublishAsync(processedEvent, cancellationToken);
+            // Send confirmation event
+            var processedEvent = new ProjectCreatedProcessedEvent
+            {
+                EventType = nameof(ProjectCreatedProcessedEvent),
+                ProjectId = projectCreatedEvent.ProjectId,
+                Success = true,
+                Message = "Project creation processed successfully",
+                GroupId = groupId,
+                GroupName = groupName
+            };
 
-        logger.LogInformation(
-            "Sent confirmation event for project {ProjectId}",
-            projectCreatedEvent.ProjectId);
+            await eventPublisher.PublishAsync(processedEvent, cancellationToken);
+
+            logger.LogInformation(
+                "Sent confirmation event for project {ProjectId}",
+                projectCreatedEvent.ProjectId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to create EntraId group for project {ProjectId}", projectCreatedEvent.ProjectId);
+
+            var processedEvent = new ProjectCreatedProcessedEvent
+            {
+                EventType = nameof(ProjectCreatedProcessedEvent),
+                ProjectId = projectCreatedEvent.ProjectId,
+                Success = false,
+                Message = $"Failed to create EntraId group: {ex.Message}"
+            };
+
+            await eventPublisher.PublishAsync(processedEvent, cancellationToken);
+        }
     }
 }
