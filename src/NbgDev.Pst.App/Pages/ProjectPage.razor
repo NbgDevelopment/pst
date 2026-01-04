@@ -26,21 +26,6 @@ else
                     <MudText Typo="Typo.h6" Class="mb-2">EntraId Security Group</MudText>
                     <MudText><strong>Group Name:</strong> @Project.Group.Name</MudText>
                     <MudText><strong>Group ID:</strong> @Project.Group.Id</MudText>
-                    
-                    @if (Project.Group.AssignedRoleIds != null && Project.Group.AssignedRoleIds.Any())
-                    {
-                        <MudText Typo="Typo.h6" Class="mt-4 mb-2">Assigned Entra ID Roles</MudText>
-                        <MudStack Class="ml-4">
-                            @foreach (var roleId in Project.Group.AssignedRoleIds)
-                            {
-                                <MudText>• Role ID: @roleId</MudText>
-                            }
-                        </MudStack>
-                    }
-                    else
-                    {
-                        <MudText Class="mt-4"><em>This group is not assigned to any Entra ID roles.</em></MudText>
-                    }
                 }
                 else
                 {

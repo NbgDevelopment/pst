@@ -141,47 +141,6 @@ public class EntraIdGroupService(
         return groupId;
     }
 
-    public async Task AssignGroupToRoleAsync(
-        string groupId,
-        string roleId,
-        CancellationToken cancellationToken = default)
-    {
-        logger.LogInformation(
-            "Assigning group {GroupId} to role {RoleId}",
-            groupId,
-            roleId);
-
-        var directoryObject = new ReferenceCreate
-        {
-            OdataId = $"https://graph.microsoft.com/v1.0/directoryObjects/{groupId}"
-        };
-
-        await graphClient.DirectoryRoles[roleId].Members.Ref.PostAsync(directoryObject, cancellationToken: cancellationToken);
-
-        logger.LogInformation(
-            "Assigned group {GroupId} to role {RoleId}",
-            groupId,
-            roleId);
-    }
-
-    public async Task RemoveGroupFromRoleAsync(
-        string groupId,
-        string roleId,
-        CancellationToken cancellationToken = default)
-    {
-        logger.LogInformation(
-            "Removing group {GroupId} from role {RoleId}",
-            groupId,
-            roleId);
-
-        await graphClient.DirectoryRoles[roleId].Members[groupId].Ref.DeleteAsync(cancellationToken: cancellationToken);
-
-        logger.LogInformation(
-            "Removed group {GroupId} from role {RoleId}",
-            groupId,
-            roleId);
-    }
-
     private string GetStage()
     {
         var stage = configuration["Stage"];
