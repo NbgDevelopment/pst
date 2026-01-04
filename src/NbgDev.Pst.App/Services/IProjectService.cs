@@ -11,4 +11,6 @@ public interface IProjectService
     Task<Project?> GetProject(Guid id);
 
     Task<Project> CreateProject(ProjectToCreate project);
+
+    Task DeleteProject(Guid id);
 }

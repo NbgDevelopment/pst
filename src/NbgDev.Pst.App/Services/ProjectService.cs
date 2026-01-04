@@ -42,6 +42,11 @@ public class ProjectService(IProjectClient projectClient) : IProjectService
         return created;
     }
 
+    public async Task DeleteProject(Guid id)
+    {
+        await projectClient.DeleteAsync(id);
+    }
+
     private Project Map(ProjectDto source)
     {
         GroupInfo? group = null;
