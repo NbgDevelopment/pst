@@ -26,8 +26,7 @@ public static class Bootstrap
         {
             var options = serviceProvider.GetRequiredService<IOptions<PstApiClientOptions>>();
             var accessTokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
-            var httpClient = new HttpClient { BaseAddress = new Uri(options.Value.ApiUrl) };
-            return new ProjectMemberClient(httpClient)
+            return new ProjectMemberClient(options.Value.ApiUrl, new HttpClient())
             {
                 AccessTokenProvider = accessTokenProvider
             };
@@ -37,8 +36,7 @@ public static class Bootstrap
         {
             var options = serviceProvider.GetRequiredService<IOptions<PstApiClientOptions>>();
             var accessTokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
-            var httpClient = new HttpClient { BaseAddress = new Uri(options.Value.ApiUrl) };
-            return new EntraIdClient(httpClient)
+            return new EntraIdClient(options.Value.ApiUrl, new HttpClient())
             {
                 AccessTokenProvider = accessTokenProvider
             };
