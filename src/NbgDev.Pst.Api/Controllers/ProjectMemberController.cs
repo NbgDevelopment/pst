@@ -1,6 +1,8 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using NbgDev.Pst.Api.Dtos;
+using NbgDev.Pst.Api.Services;
+using NbgDev.Pst.Events.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Requests;
 
@@ -8,7 +10,7 @@ namespace NbgDev.Pst.Api.Controllers;
 
 [Route("api/project/{projectId}/members")]
 [ApiController]
-public class ProjectMemberController(IMediator mediator) : ControllerBase
+public class ProjectMemberController(IMediator mediator, IEventPublisher eventPublisher) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IReadOnlyList<ProjectMemberDto>>> GetMembers(Guid projectId)
@@ -38,6 +40,16 @@ public class ProjectMemberController(IMediator mediator) : ControllerBase
             dto.Email
         ));
 
+        await eventPublisher.PublishAsync(new ProjectMemberAddedEvent
+        {
+            EventType = nameof(ProjectMemberAddedEvent),
+            ProjectId = member.ProjectId,
+            UserId = member.UserId,
+            FirstName = member.FirstName,
+            LastName = member.LastName,
+            Email = member.Email
+        });
+
         return Ok(Map(member));
     }
 
@@ -50,6 +62,13 @@ public class ProjectMemberController(IMediator mediator) : ControllerBase
         {
             return NotFound();
         }
+
+        await eventPublisher.PublishAsync(new ProjectMemberRemovedEvent
+        {
+            EventType = nameof(ProjectMemberRemovedEvent),
+            ProjectId = projectId,
+            UserId = userId
+        });
 
         return NoContent();
     }
