@@ -77,6 +77,8 @@ public class EventProcessor(
                                     JsonSerializer.Deserialize<Events.Contract.Models.ProjectMemberAddedEvent>(message.MessageText),
                                 nameof(Events.Contract.Models.ProjectMemberRemovedEvent) => 
                                     JsonSerializer.Deserialize<Events.Contract.Models.ProjectMemberRemovedEvent>(message.MessageText),
+                                nameof(Events.Contract.Models.ProjectDeletedEvent) => 
+                                    JsonSerializer.Deserialize<Events.Contract.Models.ProjectDeletedEvent>(message.MessageText),
                                 _ => null
                             };
 

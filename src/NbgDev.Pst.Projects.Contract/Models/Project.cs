@@ -7,4 +7,6 @@ public class Project
     public required string Name { get; set; }
 
     public required string ShortName { get; set; }
+
+    public string? GroupId { get; set; }
 }

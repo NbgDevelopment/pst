@@ -40,6 +40,50 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return Map(project);
     }
 
+    public async Task UpdateProjectGroupId(Guid projectId, string groupId)
+    {
+        var tableClient = await GetTableClient();
+
+        var project = await tableClient.GetEntityAsync<ProjectEntity>(ProjectEntity.EntityPartitionKey, projectId.ToString());
+        
+        if (!project.HasValue)
+        {
+            throw new InvalidOperationException($"Project {projectId} not found");
+        }
+
+        var projectEntity = project.Value;
+        projectEntity.GroupId = groupId;
+
+        await tableClient.UpdateEntityAsync(projectEntity, projectEntity.ETag);
+    }
+
+    public async Task<bool> DeleteProject(Guid projectId)
+    {
+        var tableClient = await GetTableClient();
+
+        try
+        {
+            // Delete the project
+            await tableClient.DeleteEntityAsync(ProjectEntity.EntityPartitionKey, projectId.ToString());
+
+            // Delete all members of the project
+            var partitionKey = ProjectMemberEntity.EntityPartitionKeyPrefix + projectId;
+            var members = tableClient.Query<ProjectMemberEntity>(e => e.PartitionKey == partitionKey);
+
+            foreach (var member in members)
+            {
+                await tableClient.DeleteEntityAsync(partitionKey, member.UserId);
+            }
+
+            return true;
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            // Entity doesn't exist
+            return false;
+        }
+    }
+
     public async Task<IReadOnlyList<ProjectMember>> GetProjectMembers(Guid projectId)
     {
         var tableClient = await GetTableClient();
@@ -98,7 +142,8 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         {
             Id = project.Id,
             Name = project.Name,
-            ShortName = project.ShortName
+            ShortName = project.ShortName,
+            GroupId = project.GroupId
         };
     }
 
