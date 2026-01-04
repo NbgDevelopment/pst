@@ -40,6 +40,9 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
             dto.Email
         ));
 
+        // Get project to retrieve GroupId
+        var project = await mediator.Send(new GetProjectRequest(projectId));
+
         await eventPublisher.PublishAsync(new ProjectMemberAddedEvent
         {
             EventType = nameof(ProjectMemberAddedEvent),
@@ -47,7 +50,8 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
             UserId = member.UserId,
             FirstName = member.FirstName,
             LastName = member.LastName,
-            Email = member.Email
+            Email = member.Email,
+            GroupId = project?.Group?.Id
         });
 
         return Ok(Map(member));
@@ -63,11 +67,15 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
             return NotFound();
         }
 
+        // Get project to retrieve GroupId
+        var project = await mediator.Send(new GetProjectRequest(projectId));
+
         await eventPublisher.PublishAsync(new ProjectMemberRemovedEvent
         {
             EventType = nameof(ProjectMemberRemovedEvent),
             ProjectId = projectId,
-            UserId = userId
+            UserId = userId,
+            GroupId = project?.Group?.Id
         });
 
         return NoContent();

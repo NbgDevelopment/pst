@@ -23,27 +23,23 @@ public class ProjectDeletedEventHandler(
             "Processing project deleted event for project {ProjectId}",
             projectDeletedEvent.ProjectId);
 
+        // Check if group ID is available
+        if (string.IsNullOrEmpty(projectDeletedEvent.GroupId))
+        {
+            logger.LogWarning(
+                "No group ID found for project {ProjectId}, nothing to delete",
+                projectDeletedEvent.ProjectId);
+            return;
+        }
+
         try
         {
-            // Find the group for this project
-            var groupId = await entraIdGroupService.GetGroupIdForProjectAsync(
-                projectDeletedEvent.ProjectId,
-                cancellationToken);
-
-            if (groupId == null)
-            {
-                logger.LogWarning(
-                    "No group found for project {ProjectId}, nothing to delete",
-                    projectDeletedEvent.ProjectId);
-                return;
-            }
-
             // Delete the group
-            await entraIdGroupService.DeleteGroupAsync(groupId, cancellationToken);
+            await entraIdGroupService.DeleteGroupAsync(projectDeletedEvent.GroupId, cancellationToken);
 
             logger.LogInformation(
                 "Successfully deleted group {GroupId} for project {ProjectId}",
-                groupId,
+                projectDeletedEvent.GroupId,
                 projectDeletedEvent.ProjectId);
         }
         catch (Exception ex)

@@ -6,4 +6,5 @@ public class ProjectMemberRemovedEvent : BaseEvent
 {
     public required Guid ProjectId { get; set; }
     public required string UserId { get; set; }
+    public string? GroupId { get; set; }
 }

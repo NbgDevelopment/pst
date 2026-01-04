@@ -63,6 +63,9 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(Guid id)
     {
+        // Get project to retrieve GroupId before deletion
+        var project = await mediator.Send(new GetProjectRequest(id));
+        
         var deleted = await mediator.Send(new DeleteProjectRequest(id));
 
         if (!deleted)
@@ -73,7 +76,8 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
         await eventPublisher.PublishAsync(new ProjectDeletedEvent
         {
             EventType = nameof(ProjectDeletedEvent),
-            ProjectId = id
+            ProjectId = id,
+            GroupId = project?.Group?.Id
         });
 
         return NoContent();

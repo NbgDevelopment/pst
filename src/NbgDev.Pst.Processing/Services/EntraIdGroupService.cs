@@ -105,42 +105,6 @@ public class EntraIdGroupService(
             groupId);
     }
 
-    public async Task<string?> GetGroupIdForProjectAsync(
-        Guid projectId,
-        CancellationToken cancellationToken = default)
-    {
-        logger.LogInformation(
-            "Searching for group for project {ProjectId}",
-            projectId);
-
-        // projectId is a Guid, so it's safe from injection attacks
-        var groups = await graphClient.Groups
-            .GetAsync(requestConfiguration =>
-            {
-                requestConfiguration.QueryParameters.Filter = $"description eq 'Members of project (Project ID: {projectId})'";
-                requestConfiguration.QueryParameters.Select = new[] { "id", "displayName" };
-                requestConfiguration.QueryParameters.Top = 1;
-            }, cancellationToken: cancellationToken);
-
-        var groupId = groups?.Value?.FirstOrDefault()?.Id;
-
-        if (groupId != null)
-        {
-            logger.LogInformation(
-                "Found group {GroupId} for project {ProjectId}",
-                groupId,
-                projectId);
-        }
-        else
-        {
-            logger.LogInformation(
-                "No group found for project {ProjectId}",
-                projectId);
-        }
-
-        return groupId;
-    }
-
     private string GetStage()
     {
         var stage = configuration["Stage"];

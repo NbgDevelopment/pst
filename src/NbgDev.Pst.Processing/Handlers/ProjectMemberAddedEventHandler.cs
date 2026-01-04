@@ -26,32 +26,28 @@ public class ProjectMemberAddedEventHandler(
             memberAddedEvent.FirstName,
             memberAddedEvent.LastName);
 
+        // Check if group ID is available
+        if (string.IsNullOrEmpty(memberAddedEvent.GroupId))
+        {
+            logger.LogWarning(
+                "No group ID found for project {ProjectId}, cannot add member {UserId}",
+                memberAddedEvent.ProjectId,
+                memberAddedEvent.UserId);
+            return;
+        }
+
         try
         {
-            // Find the group for this project
-            var groupId = await entraIdGroupService.GetGroupIdForProjectAsync(
-                memberAddedEvent.ProjectId,
-                cancellationToken);
-
-            if (groupId == null)
-            {
-                logger.LogWarning(
-                    "No group found for project {ProjectId}, cannot add member {UserId}",
-                    memberAddedEvent.ProjectId,
-                    memberAddedEvent.UserId);
-                return;
-            }
-
             // Add member to the group
             await entraIdGroupService.AddMemberToGroupAsync(
-                groupId,
+                memberAddedEvent.GroupId,
                 memberAddedEvent.UserId,
                 cancellationToken);
 
             logger.LogInformation(
                 "Successfully added user {UserId} to group {GroupId} for project {ProjectId}",
                 memberAddedEvent.UserId,
-                groupId,
+                memberAddedEvent.GroupId,
                 memberAddedEvent.ProjectId);
         }
         catch (Exception ex)

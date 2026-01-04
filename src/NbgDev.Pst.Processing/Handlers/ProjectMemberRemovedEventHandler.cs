@@ -24,32 +24,28 @@ public class ProjectMemberRemovedEventHandler(
             memberRemovedEvent.ProjectId,
             memberRemovedEvent.UserId);
 
+        // Check if group ID is available
+        if (string.IsNullOrEmpty(memberRemovedEvent.GroupId))
+        {
+            logger.LogWarning(
+                "No group ID found for project {ProjectId}, cannot remove member {UserId}",
+                memberRemovedEvent.ProjectId,
+                memberRemovedEvent.UserId);
+            return;
+        }
+
         try
         {
-            // Find the group for this project
-            var groupId = await entraIdGroupService.GetGroupIdForProjectAsync(
-                memberRemovedEvent.ProjectId,
-                cancellationToken);
-
-            if (groupId == null)
-            {
-                logger.LogWarning(
-                    "No group found for project {ProjectId}, cannot remove member {UserId}",
-                    memberRemovedEvent.ProjectId,
-                    memberRemovedEvent.UserId);
-                return;
-            }
-
             // Remove member from the group
             await entraIdGroupService.RemoveMemberFromGroupAsync(
-                groupId,
+                memberRemovedEvent.GroupId,
                 memberRemovedEvent.UserId,
                 cancellationToken);
 
             logger.LogInformation(
                 "Successfully removed user {UserId} from group {GroupId} for project {ProjectId}",
                 memberRemovedEvent.UserId,
-                groupId,
+                memberRemovedEvent.GroupId,
                 memberRemovedEvent.ProjectId);
         }
         catch (Exception ex)
