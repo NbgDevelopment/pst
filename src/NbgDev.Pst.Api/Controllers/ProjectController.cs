@@ -60,13 +60,33 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
         return Ok(Map(project));
     }
 
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(Guid id)
+    {
+        var deleted = await mediator.Send(new DeleteProjectRequest(id));
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
+
+        await eventPublisher.PublishAsync(new ProjectDeletedEvent
+        {
+            EventType = nameof(ProjectDeletedEvent),
+            ProjectId = id
+        });
+
+        return NoContent();
+    }
+
     private static ProjectDto Map(Project project)
     {
         return new ProjectDto
         {
             Id = project.Id,
             Name = project.Name,
-            ShortName = project.ShortName
+            ShortName = project.ShortName,
+            GroupId = project.GroupId
         };
     }
 }

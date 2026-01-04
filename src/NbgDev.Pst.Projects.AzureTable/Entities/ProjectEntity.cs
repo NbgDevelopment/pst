@@ -13,6 +13,8 @@ internal class ProjectEntity : ITableEntity
 
     public required string ShortName { get; set; }
 
+    public string? GroupId { get; set; }
+
     public string PartitionKey { get; set; } = EntityPartitionKey;
 
     public string RowKey

@@ -43,3 +43,19 @@ variable "connectionstring_queues" {
   type      = string
   sensitive = true
 }
+
+variable "azure_ad_tenant_id" {
+  type        = string
+  description = "Azure AD Tenant ID for Processing app authentication"
+}
+
+variable "azure_ad_client_id" {
+  type        = string
+  description = "Azure AD Client ID (App Registration) for the Processing app"
+}
+
+variable "azure_ad_client_secret" {
+  type        = string
+  sensitive   = true
+  description = "Azure AD Client Secret for the Processing app to authenticate to Microsoft Graph"
+}
