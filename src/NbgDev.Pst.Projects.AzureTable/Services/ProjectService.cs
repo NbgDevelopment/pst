@@ -7,6 +7,12 @@ namespace NbgDev.Pst.Projects.AzureTable.Services;
 
 internal class ProjectService(TableServiceClient tableServiceClient) : IProjectService
 {
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = false
+    };
+
     public async Task<IReadOnlyList<Project>> GetProjects()
     {
         var tableClient = await GetTableClient();
@@ -53,7 +59,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         }
 
         var projectEntity = project.Value;
-        projectEntity.GroupJson = JsonSerializer.Serialize(group);
+        projectEntity.GroupJson = JsonSerializer.Serialize(group, JsonOptions);
 
         await tableClient.UpdateEntityAsync(projectEntity, projectEntity.ETag);
     }
@@ -144,7 +150,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         {
             try
             {
-                group = JsonSerializer.Deserialize<GroupInfo>(project.GroupJson);
+                group = JsonSerializer.Deserialize<GroupInfo>(project.GroupJson, JsonOptions);
             }
             catch (JsonException)
             {

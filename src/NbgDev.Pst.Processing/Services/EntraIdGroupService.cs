@@ -113,6 +113,7 @@ public class EntraIdGroupService(
             "Searching for group for project {ProjectId}",
             projectId);
 
+        // projectId is a Guid, so it's safe from injection attacks
         var groups = await graphClient.Groups
             .GetAsync(requestConfiguration =>
             {
