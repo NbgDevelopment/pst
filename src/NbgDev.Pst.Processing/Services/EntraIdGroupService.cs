@@ -172,6 +172,12 @@ public class EntraIdGroupService(
             .Where(c => char.IsLetterOrDigit(c) || c == '-')
             .ToArray());
 
+        // Ensure we have a valid shortName after sanitization
+        if (string.IsNullOrWhiteSpace(sanitizedShortName))
+        {
+            sanitizedShortName = "project";
+        }
+
         // Don't add stage suffix for Production or Prod
         if (string.Equals(stage, "Production", StringComparison.OrdinalIgnoreCase) ||
             string.Equals(stage, "Prod", StringComparison.OrdinalIgnoreCase))
@@ -183,6 +189,12 @@ public class EntraIdGroupService(
         var sanitizedStage = new string(stage
             .Where(c => char.IsLetterOrDigit(c) || c == '-')
             .ToArray());
+
+        // Ensure we have a valid stage after sanitization
+        if (string.IsNullOrWhiteSpace(sanitizedStage))
+        {
+            sanitizedStage = "env";
+        }
 
         return $"pst-{sanitizedShortName}-{sanitizedStage}".ToLowerInvariant();
     }

@@ -20,11 +20,11 @@ builder.Services.AddSingleton<GraphServiceClient>(sp =>
     
     if (string.IsNullOrEmpty(tenantId))
     {
-        throw new InvalidOperationException("AzureAd:TenantId is not configured. Please set it in appsettings.json or user secrets.");
+        throw new InvalidOperationException("AzureAd:TenantId is not configured. Please set it in configuration, environment variables, or Azure Key Vault.");
     }
     if (string.IsNullOrEmpty(clientId))
     {
-        throw new InvalidOperationException("AzureAd:ClientId is not configured. Please set it in appsettings.json or user secrets.");
+        throw new InvalidOperationException("AzureAd:ClientId is not configured. Please set it in configuration, environment variables, or Azure Key Vault.");
     }
     if (string.IsNullOrEmpty(clientSecret))
     {

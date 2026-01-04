@@ -48,7 +48,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         
         if (!project.HasValue)
         {
-            throw new InvalidOperationException($"Project {projectId} not found");
+            throw new InvalidOperationException($"Failed to update GroupId: Project {projectId} not found");
         }
 
         var projectEntity = project.Value;
@@ -67,7 +67,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
             await tableClient.DeleteEntityAsync(ProjectEntity.EntityPartitionKey, projectId.ToString());
 
             // Delete all members of the project
-            var partitionKey = ProjectMemberEntity.EntityPartitionKeyPrefix + projectId;
+            var partitionKey = $"{ProjectMemberEntity.EntityPartitionKeyPrefix}{projectId}";
             var members = tableClient.Query<ProjectMemberEntity>(e => e.PartitionKey == partitionKey);
 
             foreach (var member in members)

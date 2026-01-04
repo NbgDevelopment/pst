@@ -53,7 +53,7 @@ public class ProjectCreatedEventHandler(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Failed to process project created event for project {ProjectId}", projectCreatedEvent.ProjectId);
+            logger.LogError(ex, "Failed to create EntraId group for project {ProjectId}", projectCreatedEvent.ProjectId);
 
             var processedEvent = new ProjectCreatedProcessedEvent
             {

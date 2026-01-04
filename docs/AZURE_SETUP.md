@@ -751,14 +751,14 @@ dotnet user-secrets set "Stage" "Debug"
 For automated deployments, the Processing app Azure AD configuration is managed via Terraform.
 
 1. **Update your Terraform variables** (in `terraform.tfvars` or via GitHub Secrets):
-   - `processing_azure_ad_tenant_id` - Your Azure AD tenant ID
+   - `azure_ad_tenant_id` - Your Azure AD tenant ID (same tenant ID used for API)
    - `processing_azure_ad_client_id` - Your Processing App Registration client ID
    - `processing_azure_ad_client_secret` - Your Processing App Registration client secret
 
 2. **Add GitHub Secrets** for CI/CD (in addition to the existing secrets):
-   - `PROCESSING_AZURE_AD_TENANT_ID` - Your Azure AD tenant ID (same as above)
    - `PROCESSING_AZURE_AD_CLIENT_ID` - Your Processing App Registration client ID
    - `PROCESSING_AZURE_AD_CLIENT_SECRET` - Your Processing App Registration client secret
+   - Note: The `AZURE_AD_TENANT_ID` secret is already used for both API and Processing apps
 
 3. **Update the Terraform module** to pass these variables to the Processing container app (this should already be configured in the infrastructure code)
 
