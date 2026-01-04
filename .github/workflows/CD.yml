@@ -139,6 +139,8 @@ jobs:
         -var 'azure_ad_client_id=${{ secrets.AZURE_AD_CLIENT_ID }}'
         -var 'azure_ad_client_secret=${{ secrets.AZURE_AD_CLIENT_SECRET }}'
         -var 'azure_ad_audience=${{ secrets.AZURE_AD_AUDIENCE }}'
+        -var 'processing_azure_ad_client_id=${{ secrets.PROCESSING_AZURE_AD_CLIENT_ID }}'
+        -var 'processing_azure_ad_client_secret=${{ secrets.PROCESSING_AZURE_AD_CLIENT_SECRET }}'
         -auto-approve
       working-directory: ./src/.azure
       env:

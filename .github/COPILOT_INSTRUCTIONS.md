@@ -264,6 +264,13 @@ The project uses Terraform to manage Azure infrastructure as code. All Terraform
    - Test initialization with `terraform init`
    - These checks are automated in the CI workflow
 
+5. **Workflow Synchronization**:
+   - **CRITICAL**: When adding, removing, or modifying input variables in `inputs.tf`, the CD workflow (`.github/workflows/CD.yml`) **MUST** be updated accordingly
+   - All Terraform input variables defined in `src/.azure/inputs.tf` must be passed to the `terraform apply` command in the CD workflow
+   - Ensure that new required variables are added to GitHub Secrets or Variables as appropriate
+   - Verify that all variables in `inputs.tf` have corresponding `-var` flags in the workflow's Terraform Apply step
+   - This ensures deployments do not fail due to missing required parameters
+
 ### Key Resources
 1. **Resource Group**: `rg-pst-{stage}` in Germany West Central region
 2. **Monitoring**: Application Insights for telemetry and logging
