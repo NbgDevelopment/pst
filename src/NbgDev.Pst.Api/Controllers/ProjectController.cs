@@ -61,6 +61,8 @@ public class ProjectController(IMediator mediator, IEventPublisher eventPublishe
     }
 
     [HttpDelete("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> Delete(Guid id)
     {
         // Get project to retrieve GroupId before deletion
