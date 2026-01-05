@@ -8,11 +8,11 @@ resource "azurerm_storage_account" "storage" {
 }
 
 resource "azurerm_storage_queue" "api_events" {
-  name                 = "api-events"
-  storage_account_name = azurerm_storage_account.storage.name
+  name               = "api-events"
+  storage_account_id = azurerm_storage_account.storage.id
 }
 
 resource "azurerm_storage_queue" "processing_events" {
-  name                 = "processing-events"
-  storage_account_name = azurerm_storage_account.storage.name
+  name               = "processing-events"
+  storage_account_id = azurerm_storage_account.storage.id
 }
