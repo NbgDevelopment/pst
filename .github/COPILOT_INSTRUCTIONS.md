@@ -183,6 +183,11 @@ public static class BootstrapProjectsAzureTable
    - Use Microsoft Identity Web with JWT Bearer authentication
    - Configure Azure AD in `appsettings.json` under `AzureAd` section
    - Apply authorization policies as needed
+   - **IMPORTANT**: All API clients must handle 401 Unauthorized responses by logging out the user
+     - When creating new API clients, ensure they inherit from `PstApiClient` to automatically handle 401 responses
+     - The `PstApiClient.ProcessResponseAsync` method checks for 401 status codes and triggers logout
+     - All API clients must have `NavigationManager` injected to enable automatic logout on 401 errors
+     - This ensures that when tokens expire and cannot be refreshed, users are logged out and prompted to log in again
 
 7. **CORS**
    - Configure CORS policy for frontend origins
