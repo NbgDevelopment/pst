@@ -32,9 +32,9 @@
     </div>
     <script>
         // CRITICAL: Clear expired MSAL tokens BEFORE the authentication service loads
-        // This prevents MSAL from trying to use expired refresh tokens
-        // Note: This logic is duplicated from tokenExpiration.js because it must run
-        // synchronously before MSAL initializes. Module imports are async and would be too late.
+        // When the app starts with expired tokens in localStorage, they are cleared to ensure
+        // the app starts in a logged-out state. MSAL handles token refresh automatically during
+        // runtime, so this check only needs to run at startup.
         try {
             const now = Date.now();
             let foundExpired = false;
@@ -71,7 +71,7 @@
                                 
                                 if (expirationTime && expirationTime < now) {
                                     foundExpired = true;
-                                    console.log(`Found expired ${parsed.credentialType || 'token'} (expired: ${new Date(expirationTime).toISOString()})`);
+                                    console.log(`Found expired ${parsed.credentialType || 'token'} at startup (expired: ${new Date(expirationTime).toISOString()})`);
                                     break;
                                 }
                             }
@@ -91,7 +91,7 @@
                 }
                 
                 keysToRemove.forEach(key => localStorage.removeItem(key));
-                console.log(`Cleared ${keysToRemove.length} MSAL cache entries due to expired tokens`);
+                console.log(`Cleared ${keysToRemove.length} MSAL cache entries at startup due to expired tokens`);
             }
         } catch (e) {
             console.error('Error clearing expired tokens:', e);
