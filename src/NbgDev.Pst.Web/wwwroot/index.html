@@ -30,6 +30,73 @@
         <a href="." class="reload">Reload</a>
         <span class="dismiss">🗙</span>
     </div>
+    <script type="module">
+        // Clear expired MSAL tokens before the authentication service loads
+        // This prevents MSAL from trying to use expired refresh tokens
+        (function() {
+            try {
+                const now = Date.now();
+                let foundExpired = false;
+                const keysToRemove = [];
+                
+                // Collect all localStorage keys
+                const allKeys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key) {
+                        allKeys.push(key);
+                    }
+                }
+                
+                // Check for expired tokens
+                for (const key of allKeys) {
+                    if (key.includes('msal')) {
+                        const value = localStorage.getItem(key);
+                        if (value) {
+                            try {
+                                const parsed = JSON.parse(value);
+                                const tokenTypes = ['AccessToken', 'IdToken', 'RefreshToken'];
+                                
+                                if (parsed.secret || tokenTypes.includes(parsed.credentialType)) {
+                                    let expirationTime = null;
+                                    
+                                    if (parsed.expiresOn) {
+                                        expirationTime = new Date(parsed.expiresOn).getTime();
+                                    } else if (parsed.expires_on) {
+                                        expirationTime = parsed.expires_on * 1000;
+                                    } else if (parsed.extendedExpiresOn) {
+                                        expirationTime = new Date(parsed.extendedExpiresOn).getTime();
+                                    }
+                                    
+                                    if (expirationTime && expirationTime < now) {
+                                        foundExpired = true;
+                                        console.log(`Found expired ${parsed.credentialType || 'token'} (expired: ${new Date(expirationTime).toISOString()})`);
+                                        break;
+                                    }
+                                }
+                            } catch (parseError) {
+                                // Skip entries that can't be parsed
+                            }
+                        }
+                    }
+                }
+                
+                // Clear all MSAL cache if any expired token was found
+                if (foundExpired) {
+                    for (const key of allKeys) {
+                        if (key.includes('msal')) {
+                            keysToRemove.push(key);
+                        }
+                    }
+                    
+                    keysToRemove.forEach(key => localStorage.removeItem(key));
+                    console.log(`Cleared ${keysToRemove.length} MSAL cache entries due to expired tokens`);
+                }
+            } catch (e) {
+                console.error('Error clearing expired tokens:', e);
+            }
+        })();
+    </script>
     <script src="_content/Microsoft.Authentication.WebAssembly.Msal/AuthenticationService.js"></script>
     <script src="_framework/blazor.webassembly.js"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
