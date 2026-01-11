@@ -26,7 +26,9 @@ export function clearExpiredMsalTokens() {
                         
                         // Check if this entry has an expiration time
                         // MSAL stores different types of data; we're looking for tokens with expiration
-                        const tokenTypes = ['AccessToken', 'IdToken'];
+                        // Note: RefreshToken credentials might not have expiration info in the cache,
+                        // but if we find expired access/ID tokens, we clear everything including refresh tokens
+                        const tokenTypes = ['AccessToken', 'IdToken', 'RefreshToken'];
                         if (parsed.secret || tokenTypes.includes(parsed.credentialType)) {
                             // Check for expiration in various formats MSAL might use
                             let expirationTime = null;
@@ -44,7 +46,7 @@ export function clearExpiredMsalTokens() {
                             // If we found an expiration time and it's in the past
                             if (expirationTime && expirationTime < now) {
                                 foundExpired = true;
-                                console.log('Found expired token in localStorage');
+                                console.log(`Found expired ${parsed.credentialType || 'token'} in localStorage (expired: ${new Date(expirationTime).toISOString()})`);
                                 break; // No need to check further
                             }
                         }
@@ -56,7 +58,7 @@ export function clearExpiredMsalTokens() {
         }
         
         // If we found any expired token, clear all MSAL cache entries
-        // This ensures a clean logged-out state
+        // This ensures a clean logged-out state and removes refresh tokens too
         if (foundExpired) {
             for (const key of allKeys) {
                 if (key.includes('msal')) {
@@ -69,7 +71,7 @@ export function clearExpiredMsalTokens() {
                 localStorage.removeItem(key);
             });
             
-            console.log(`Cleared ${keysToRemove.length} expired MSAL cache entries from localStorage`);
+            console.log(`Cleared ${keysToRemove.length} MSAL cache entries from localStorage due to expired tokens`);
         }
         
         return true;
