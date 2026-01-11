@@ -39,6 +39,9 @@ builder.Services.AddMsalAuthentication(options =>
     
     // Configure MSAL to use localStorage for persistent login across browser restarts
     options.ProviderOptions.Cache.CacheLocation = "localStorage";
+    
+    // Redirect to home page after logout
+    options.ProviderOptions.Authentication.PostLogoutRedirectUri = builder.HostEnvironment.BaseAddress;
 });
 
 await builder.Build().RunAsync();
