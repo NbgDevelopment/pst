@@ -58,7 +58,11 @@
                             const parsed = JSON.parse(value);
                             const tokenTypes = ['AccessToken', 'IdToken', 'RefreshToken'];
                             
-                            if (parsed.secret || tokenTypes.includes(parsed.credentialType)) {
+                            // Check both credentialType and the presence of token properties
+                            // MSAL stores tokens with different property names:
+                            // - Access/ID tokens: credentialType = 'AccessToken'/'IdToken', secret property
+                            // - Refresh tokens: may have refreshToken property (camelCase)
+                            if (parsed.secret || parsed.refreshToken || tokenTypes.includes(parsed.credentialType)) {
                                 let expirationTime = null;
                                 
                                 if (parsed.expiresOn) {
