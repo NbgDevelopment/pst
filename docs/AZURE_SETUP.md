@@ -807,6 +807,163 @@ Groups are created with the following naming convention:
 - Verify the Stage environment variable is correctly set in your deployment
 - For production, ensure Stage is set to "Production" or "Prod" to avoid stage suffix in group names
 
+## 9. Configure Redirect URIs for Web Application Authentication
+
+The web application uses Microsoft Authentication Library (MSAL) for user authentication. For the authentication flow to work correctly, including proper post-logout behavior, you need to configure redirect URIs in the Azure AD App Registration for the web application.
+
+### Create Web App Registration
+
+If you haven't already created an App Registration for the web application (different from the API and Processing app registrations), create one:
+
+#### Using Azure Portal
+
+1. Navigate to **Azure Active Directory** > **App registrations**
+2. Click **New registration**
+3. Enter the following details:
+   - **Name**: `pst-web` (or your preferred name)
+   - **Supported account types**: Accounts in this organizational directory only
+   - **Redirect URI**: 
+     - Platform: Single-page application (SPA)
+     - URI: `https://your-web-app-url/authentication/login-callback`
+     - For local development: `https://localhost:7179/authentication/login-callback`
+4. Click **Register**
+5. Note down the **Application (client) ID** - this is what you use in the web app's `appsettings.json` as `AzureAd:ClientId`
+
+#### Using Azure CLI
+
+```bash
+# Create the app registration for the Web app
+az ad app create \
+  --display-name "pst-web" \
+  --sign-in-audience AzureADMyOrg \
+  --web-redirect-uris "https://your-web-app-url/authentication/login-callback" \
+  --enable-id-token-issuance true
+
+# Note the appId for configuration
+WEB_APP_ID="<your-web-app-id>"
+```
+
+### Configure Redirect URIs
+
+The web application requires specific redirect URIs for the authentication flow:
+
+#### Login Redirect URI
+
+- **Purpose**: Where Azure AD redirects after successful login
+- **Path**: `/authentication/login-callback`
+- **Platform**: Single-page application (SPA)
+- **Example**: `https://your-web-app-url/authentication/login-callback`
+
+#### Logout Redirect URI
+
+- **Purpose**: Where Azure AD redirects after logout
+- **Path**: `/` (home page)
+- **Platform**: Single-page application (SPA)
+- **Example**: `https://your-web-app-url/`
+
+#### Using Azure Portal
+
+1. Navigate to your Web App Registration (`pst-web`)
+2. Go to **Authentication**
+3. Under **Platform configurations**, find **Single-page application**
+4. Add the following Redirect URIs:
+   - `https://your-web-app-url/authentication/login-callback`
+   - `https://your-web-app-url/` (for post-logout redirect)
+5. For local development, also add:
+   - `https://localhost:7179/authentication/login-callback`
+   - `https://localhost:7179/`
+6. Under **Implicit grant and hybrid flows**:
+   - Enable **ID tokens** (required for MSAL.js)
+7. Click **Save**
+
+#### Using Azure CLI
+
+```bash
+# Set variables
+WEB_APP_ID="<your-web-app-id>"
+WEB_APP_URL="https://your-web-app-url"
+
+# Add redirect URIs for production
+az ad app update --id $WEB_APP_ID \
+  --web-redirect-uris \
+    "${WEB_APP_URL}/authentication/login-callback" \
+    "${WEB_APP_URL}/" \
+    "https://localhost:7179/authentication/login-callback" \
+    "https://localhost:7179/"
+
+# Enable ID token issuance
+az ad app update --id $WEB_APP_ID --enable-id-token-issuance true
+```
+
+### Front Channel Logout URL (Optional but Recommended)
+
+For enhanced logout experience across multiple tabs/windows:
+
+1. In the Azure Portal, go to your Web App Registration
+2. Navigate to **Authentication**
+3. Under **Front-channel logout URL**, add:
+   - `https://your-web-app-url/authentication/logout`
+4. Click **Save**
+
+### Application Configuration
+
+The web application automatically configures the post-logout redirect URI to return to the home page. This is set in `Program.cs`:
+
+```csharp
+options.ProviderOptions.Authentication.PostLogoutRedirectUri = builder.HostEnvironment.BaseAddress;
+```
+
+No additional configuration is needed in `appsettings.json` beyond the standard Azure AD settings:
+
+```json
+{
+  "AzureAd": {
+    "Authority": "https://login.microsoftonline.com/<your-tenant-id>",
+    "ClientId": "<your-web-app-client-id>",
+    "ValidateAuthority": true
+  }
+}
+```
+
+### Deployment Considerations
+
+#### Local Development
+
+For local development, use the localhost URIs:
+- Login: `https://localhost:7179/authentication/login-callback`
+- Logout: `https://localhost:7179/`
+
+#### Production/Staging Environments
+
+For each environment, add environment-specific redirect URIs:
+- Dev: `https://web-pst-dev.azurecontainerapps.io/authentication/login-callback` and `https://web-pst-dev.azurecontainerapps.io/`
+- Prod: `https://web-pst-prod.azurecontainerapps.io/authentication/login-callback` and `https://web-pst-prod.azurecontainerapps.io/`
+
+**Note**: Azure AD allows multiple redirect URIs for the same app registration, so you can configure all environments (local, dev, staging, prod) in a single app registration.
+
+### Troubleshooting
+
+**Error: "AADSTS50011: The redirect URI specified in the request does not match"**
+- Verify the redirect URI in Azure AD matches exactly (including trailing slashes)
+- Ensure you're using the SPA platform type, not Web
+- Check that the base URL matches your deployment URL
+
+**After logout, user stays on Microsoft page instead of returning to app**
+- Verify the post-logout redirect URI (`/`) is configured in Azure AD
+- Check that `PostLogoutRedirectUri` is set in the application code
+- Ensure the base URL is correctly configured
+
+**ID token not issued**
+- Ensure "ID tokens" is enabled under Implicit grant and hybrid flows
+- Verify the app registration is using the SPA platform type
+
+### Security Notes
+
+- Always use HTTPS in production redirect URIs
+- Keep redirect URIs as specific as possible (avoid wildcards)
+- Regularly review and remove unused redirect URIs
+- Use separate app registrations for different environments if security requirements demand it
+
 ## Resources
 
 - [Azure Federated Identity Credentials](https://learn.microsoft.com/en-us/azure/active-directory/develop/workload-identity-federation)
