@@ -1,0 +1,14 @@
+@using NbgDev.Pst.App.Models
+
+<div class="pa-4">
+    @if (Project?.Group != null)
+    {
+        <MudText Typo="Typo.h6" Class="mb-2">Project Security Group</MudText>
+        <MudText><strong>Group Name:</strong> @Project.Group.Name</MudText>
+        <MudText><strong>Group ID:</strong> @Project.Group.Id</MudText>
+    }
+    else
+    {
+        <MudText>No security group has been created yet for this project.</MudText>
+    }
+</div>
