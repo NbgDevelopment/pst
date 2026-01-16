@@ -1,8 +1,6 @@
 ﻿@page "/project/{Id:guid}"
 @using NbgDev.Pst.App.Components
 
-<h3>Project</h3>
-
 @if (Project is null)
 {
     <MudText>No project with ID @Id found.</MudText>
@@ -11,7 +9,6 @@ else
 {
     <MudPaper Class="pa-4 mb-4">
         <MudText Typo="Typo.h6">@Project.Name</MudText>
-        <MudText>ID: @Project.Id</MudText>
         <MudText>Short Name: @Project.ShortName</MudText>
     </MudPaper>
 
