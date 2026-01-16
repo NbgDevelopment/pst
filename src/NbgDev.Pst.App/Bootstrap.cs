@@ -17,6 +17,8 @@ public static class Bootstrap
         services.AddScoped<IProjectService, ProjectService>();
         services.AddScoped<IProjectMemberService, ProjectMemberService>();
         services.AddScoped<IEntraIdService, EntraIdService>();
+        services.AddScoped<IProjectRoleService, ProjectRoleService>();
+        services.AddScoped<IRoleMemberService, RoleMemberService>();
 
         return services;
     }

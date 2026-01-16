@@ -1,0 +1,21 @@
+@using NbgDev.Pst.App.Models
+@using NbgDev.Pst.App.Services
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Create Role</MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="_roleName" 
+                      Label="Role Name" 
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      Class="mb-4" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CreateRole" Disabled="@(string.IsNullOrWhiteSpace(_roleName))">
+            Create
+        </MudButton>
+    </DialogActions>
+</MudDialog>

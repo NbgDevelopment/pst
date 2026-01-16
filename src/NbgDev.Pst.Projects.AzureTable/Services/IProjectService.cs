@@ -19,4 +19,16 @@ internal interface IProjectService
     Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string email);
 
     Task<bool> RemoveProjectMember(Guid projectId, string userId);
+
+    Task<IReadOnlyList<Role>> GetRoles(Guid projectId);
+
+    Task<Role> CreateRole(Guid projectId, string name);
+
+    Task<bool> DeleteRole(Guid roleId);
+
+    Task<IReadOnlyList<RoleMember>> GetRoleMembers(Guid roleId);
+
+    Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string email);
+
+    Task<bool> RemoveRoleMember(Guid roleId, string userId);
 }

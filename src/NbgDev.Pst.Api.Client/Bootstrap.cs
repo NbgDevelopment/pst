@@ -49,6 +49,30 @@ public static class Bootstrap
             };
         });
 
+        services.AddScoped<IProjectRoleClient>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<PstApiClientOptions>>();
+            var accessTokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
+            var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
+            return new ProjectRoleClient(options.Value.ApiUrl, new HttpClient())
+            {
+                AccessTokenProvider = accessTokenProvider,
+                NavigationManager = navigationManager
+            };
+        });
+
+        services.AddScoped<IProjectRoleMemberClient>(serviceProvider =>
+        {
+            var options = serviceProvider.GetRequiredService<IOptions<PstApiClientOptions>>();
+            var accessTokenProvider = serviceProvider.GetRequiredService<IAccessTokenProvider>();
+            var navigationManager = serviceProvider.GetRequiredService<NavigationManager>();
+            return new ProjectRoleMemberClient(options.Value.ApiUrl, new HttpClient())
+            {
+                AccessTokenProvider = accessTokenProvider,
+                NavigationManager = navigationManager
+            };
+        });
+
         return services;
     }
 }
