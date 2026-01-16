@@ -1,8 +1,6 @@
 ﻿@page "/project/{Id:guid}"
 @using NbgDev.Pst.App.Components
 
-<h3>Project</h3>
-
 @if (Project is null)
 {
     <MudText>No project with ID @Id found.</MudText>
