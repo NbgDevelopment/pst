@@ -7,6 +7,7 @@ namespace NbgDev.Pst.App.Services;
 public class ProjectService(IProjectClient projectClient) : IProjectService
 {
     public event Action<Project>? ProjectCreated;
+    public event Action<Guid>? ProjectDeleted;
 
     public async Task<IReadOnlyList<Project>> GetProjects()
     {
@@ -45,6 +46,7 @@ public class ProjectService(IProjectClient projectClient) : IProjectService
     public async Task DeleteProject(Guid id)
     {
         await projectClient.DeleteAsync(id);
+        ProjectDeleted?.Invoke(id);
     }
 
     private Project Map(ProjectDto source)

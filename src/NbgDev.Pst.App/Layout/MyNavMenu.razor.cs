@@ -13,6 +13,7 @@ public partial class MyNavMenu : IDisposable
     {
         _projectService = projectService;
         _projectService.ProjectCreated += OnProjectCreated;
+        _projectService.ProjectDeleted += OnProjectDeleted;
         _authenticationStateProvider = authenticationStateProvider;
         _authenticationStateProvider.AuthenticationStateChanged += OnAuthenticationStateChanged;
     }
@@ -59,9 +60,16 @@ public partial class MyNavMenu : IDisposable
         StateHasChanged();
     }
 
+    private void OnProjectDeleted(Guid projectId)
+    {
+        Projects.RemoveAll(p => p.Id == projectId);
+        StateHasChanged();
+    }
+
     public void Dispose()
     {
         _projectService.ProjectCreated -= OnProjectCreated;
+        _projectService.ProjectDeleted -= OnProjectDeleted;
         _authenticationStateProvider.AuthenticationStateChanged -= OnAuthenticationStateChanged;
     }
 }
