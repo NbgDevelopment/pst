@@ -52,7 +52,8 @@ public partial class RoleMembersDialog
     {
         var parameters = new DialogParameters<AddRoleMemberDialog>
         {
-            { x => x.RoleId, Role.Id }
+            { x => x.RoleId, Role.Id },
+            { x => x.ProjectId, Role.ProjectId }
         };
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Small, FullWidth = true };

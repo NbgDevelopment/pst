@@ -7,40 +7,44 @@
     </TitleContent>
     <DialogContent>
         <MudTextField @bind-Value="_searchTerm" 
-                      Label="Search Users" 
+                      Label="Search Project Members" 
                       Variant="Variant.Outlined"
                       Adornment="Adornment.End"
                       AdornmentIcon="@Icons.Material.Filled.Search"
-                      OnAdornmentClick="SearchUsers"
+                      OnAdornmentClick="FilterMembers"
                       OnKeyDown="HandleKeyDown"
                       Class="mb-4" />
 
-        @if (_isSearching)
+        @if (_isLoading)
         {
             <MudProgressCircular Indeterminate="true" Size="Size.Small" />
         }
-        else if (_searchResults.Any())
+        else if (_filteredMembers.Any())
         {
             <MudList T="string">
-                @foreach (var user in _searchResults)
+                @foreach (var member in _filteredMembers)
                 {
-                    <MudListItem T="string" OnClick="@(() => SelectUser(user))">
+                    <MudListItem T="string" OnClick="@(() => SelectMember(member))">
                         <div class="d-flex align-center">
                             <MudAvatar Color="Color.Primary" Class="mr-3">
-                                @(GetInitials(user))
+                                @(GetInitials(member))
                             </MudAvatar>
                             <div>
-                                <MudText Typo="Typo.body1">@user.DisplayName</MudText>
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">@user.Mail</MudText>
+                                <MudText Typo="Typo.body1">@member.FirstName @member.LastName</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@member.Email</MudText>
                             </div>
                         </div>
                     </MudListItem>
                 }
             </MudList>
         }
-        else if (!string.IsNullOrWhiteSpace(_searchTerm) && !_isSearching)
+        else if (!string.IsNullOrWhiteSpace(_searchTerm))
         {
-            <MudText>No users found. Try a different search term.</MudText>
+            <MudText>No project members found matching your search.</MudText>
+        }
+        else
+        {
+            <MudText>No project members available.</MudText>
         }
     </DialogContent>
     <DialogActions>
