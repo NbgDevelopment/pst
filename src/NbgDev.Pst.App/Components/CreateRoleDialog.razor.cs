@@ -16,6 +16,7 @@ public partial class CreateRoleDialog
     private ISnackbar Snackbar { get; set; } = default!;
 
     private string _roleName = string.Empty;
+    private string _roleDescription = string.Empty;
 
     [CascadingParameter]
     public IMudDialogInstance? DialogInstance { get; set; }
@@ -27,14 +28,14 @@ public partial class CreateRoleDialog
 
     private async Task CreateRole()
     {
-        if (string.IsNullOrWhiteSpace(_roleName))
+        if (string.IsNullOrWhiteSpace(_roleName) || string.IsNullOrWhiteSpace(_roleDescription))
         {
             return;
         }
 
         try
         {
-            await ProjectRoleService.CreateRole(ProjectId, _roleName);
+            await ProjectRoleService.CreateRole(ProjectId, _roleName, _roleDescription);
             DialogInstance?.Close(DialogResult.Ok(true));
         }
         catch (Exception ex)

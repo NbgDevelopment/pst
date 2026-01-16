@@ -11,11 +11,12 @@ public class ProjectRoleService(IProjectRoleClient projectRoleClient) : IProject
         return roles.Select(Map).ToList();
     }
 
-    public async Task<Role> CreateRole(Guid projectId, string name)
+    public async Task<Role> CreateRole(Guid projectId, string name, string description)
     {
         var dto = new CreateRoleDto
         {
-            Name = name
+            Name = name,
+            Description = description
         };
 
         var result = await projectRoleClient.CreateRoleAsync(projectId, dto);
@@ -33,7 +34,8 @@ public class ProjectRoleService(IProjectRoleClient projectRoleClient) : IProject
         {
             Id = dto.Id,
             ProjectId = dto.ProjectId,
-            Name = dto.Name
+            Name = dto.Name,
+            Description = dto.Description
         };
     }
 }

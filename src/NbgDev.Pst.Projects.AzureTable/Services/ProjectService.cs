@@ -189,13 +189,14 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return roles.Select(MapRole).ToArray();
     }
 
-    public async Task<Role> CreateRole(Guid projectId, string name)
+    public async Task<Role> CreateRole(Guid projectId, string name, string description)
     {
         var role = new RoleEntity
         {
             Id = Guid.NewGuid(),
             ProjectId = projectId,
-            Name = name
+            Name = name,
+            Description = description
         };
 
         var tableClient = await GetTableClient();
@@ -289,7 +290,8 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         {
             Id = role.Id,
             ProjectId = role.ProjectId,
-            Name = role.Name
+            Name = role.Name,
+            Description = role.Description
         };
     }
 

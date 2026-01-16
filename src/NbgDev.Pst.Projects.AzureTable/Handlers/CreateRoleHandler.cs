@@ -9,6 +9,6 @@ internal class CreateRoleHandler(IProjectService projectService) : IRequestHandl
 {
     public async Task<Role> Handle(CreateRoleRequest request, CancellationToken cancellationToken)
     {
-        return await projectService.CreateRole(request.ProjectId, request.Name);
+        return await projectService.CreateRole(request.ProjectId, request.Name, request.Description);
     }
 }

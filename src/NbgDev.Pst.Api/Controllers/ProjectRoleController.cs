@@ -27,14 +27,20 @@ public class ProjectRoleController(IMediator mediator, IEventPublisher eventPubl
             return ValidationProblem("Role name may not be null or empty");
         }
 
-        var role = await mediator.Send(new CreateRoleRequest(projectId, dto.Name));
+        if (string.IsNullOrWhiteSpace(dto.Description))
+        {
+            return ValidationProblem("Role description may not be null or empty");
+        }
+
+        var role = await mediator.Send(new CreateRoleRequest(projectId, dto.Name, dto.Description));
 
         await eventPublisher.PublishAsync(new ProjectRoleCreatedEvent
         {
             EventType = nameof(ProjectRoleCreatedEvent),
             RoleId = role.Id,
             ProjectId = role.ProjectId,
-            Name = role.Name
+            Name = role.Name,
+            Description = role.Description
         });
 
         return Ok(Map(role));
@@ -68,7 +74,8 @@ public class ProjectRoleController(IMediator mediator, IEventPublisher eventPubl
         {
             Id = role.Id,
             ProjectId = role.ProjectId,
-            Name = role.Name
+            Name = role.Name,
+            Description = role.Description
         };
     }
 }

@@ -34,12 +34,12 @@
         <MudTable Items="_roles" Hover="true" Striped="true">
             <HeaderContent>
                 <MudTh>Role Name</MudTh>
-                <MudTh>Role ID</MudTh>
+                <MudTh>Description</MudTh>
                 <MudTh>Actions</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Role Name">@context.Name</MudTd>
-                <MudTd DataLabel="Role ID">@context.Id</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
                 <MudTd DataLabel="Actions">
                     <MudTooltip Text="Manage Members">
                         <MudIconButton Icon="@Icons.Material.Filled.People" 

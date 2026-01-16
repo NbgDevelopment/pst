@@ -5,5 +5,6 @@ namespace NbgDev.Pst.Projects.Contract.Requests;
 
 public record CreateRoleRequest(
     Guid ProjectId,
-    string Name
+    string Name,
+    string Description
 ) : IRequest<Role>;

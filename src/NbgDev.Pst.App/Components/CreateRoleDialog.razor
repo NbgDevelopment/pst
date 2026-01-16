@@ -11,10 +11,15 @@
                       Variant="Variant.Outlined"
                       Required="true"
                       Class="mb-4" />
+        <MudTextField @bind-Value="_roleDescription" 
+                      Label="Description" 
+                      Variant="Variant.Outlined"
+                      Required="true"
+                      Class="mb-4" />
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CreateRole" Disabled="@(string.IsNullOrWhiteSpace(_roleName))">
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="CreateRole" Disabled="@(string.IsNullOrWhiteSpace(_roleName) || string.IsNullOrWhiteSpace(_roleDescription))">
             Create
         </MudButton>
     </DialogActions>
