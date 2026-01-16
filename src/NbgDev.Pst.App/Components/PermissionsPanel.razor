@@ -11,4 +11,50 @@
     {
         <MudText>No security group has been created yet for this project.</MudText>
     }
+
+    <MudDivider Class="my-6" />
+
+    <div class="d-flex justify-space-between align-center mb-4">
+        <MudText Typo="Typo.h6">Project Roles</MudText>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenCreateRoleDialog">
+            Create Role
+        </MudButton>
+    </div>
+
+    @if (_isLoadingRoles)
+    {
+        <MudProgressCircular Indeterminate="true" />
+    }
+    else if (_roles == null || !_roles.Any())
+    {
+        <MudText>No roles defined for this project yet.</MudText>
+    }
+    else
+    {
+        <MudTable Items="_roles" Hover="true" Striped="true">
+            <HeaderContent>
+                <MudTh>Role Name</MudTh>
+                <MudTh>Role ID</MudTh>
+                <MudTh>Actions</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Role Name">@context.Name</MudTd>
+                <MudTd DataLabel="Role ID">@context.Id</MudTd>
+                <MudTd DataLabel="Actions">
+                    <MudTooltip Text="Manage Members">
+                        <MudIconButton Icon="@Icons.Material.Filled.People" 
+                                       Color="Color.Primary" 
+                                       OnClick="@(() => OpenRoleMembersDialog(context))"
+                                       Size="Size.Small" />
+                    </MudTooltip>
+                    <MudTooltip Text="Delete Role">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                       Color="Color.Error" 
+                                       OnClick="@(() => ConfirmDeleteRole(context))"
+                                       Size="Size.Small" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
 </div>

@@ -41,6 +41,10 @@ builder.Services.AddScoped<IEventHandler, ProjectCreatedEventHandler>();
 builder.Services.AddScoped<IEventHandler, ProjectMemberAddedEventHandler>();
 builder.Services.AddScoped<IEventHandler, ProjectMemberRemovedEventHandler>();
 builder.Services.AddScoped<IEventHandler, ProjectDeletedEventHandler>();
+builder.Services.AddScoped<IEventHandler, ProjectRoleCreatedEventHandler>();
+builder.Services.AddScoped<IEventHandler, ProjectRoleDeletedEventHandler>();
+builder.Services.AddScoped<IEventHandler, ProjectMemberAddedToRoleEventHandler>();
+builder.Services.AddScoped<IEventHandler, ProjectMemberRemovedFromRoleEventHandler>();
 builder.Services.AddScoped<NbgDev.Pst.Processing.Services.IEventPublisher, NbgDev.Pst.Processing.Services.EventPublisher>();
 builder.Services.AddHostedService<EventProcessor>();
 

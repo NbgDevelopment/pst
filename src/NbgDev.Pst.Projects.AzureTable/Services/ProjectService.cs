@@ -178,4 +178,130 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
             Email = member.Email
         };
     }
+
+    public async Task<IReadOnlyList<Role>> GetRoles(Guid projectId)
+    {
+        var tableClient = await GetTableClient();
+
+        var partitionKey = RoleEntity.EntityPartitionKeyPrefix + projectId;
+        var roles = tableClient.Query<RoleEntity>(e => e.PartitionKey == partitionKey);
+
+        return roles.Select(MapRole).ToArray();
+    }
+
+    public async Task<Role> CreateRole(Guid projectId, string name)
+    {
+        var role = new RoleEntity
+        {
+            Id = Guid.NewGuid(),
+            ProjectId = projectId,
+            Name = name
+        };
+
+        var tableClient = await GetTableClient();
+        await tableClient.AddEntityAsync(role);
+
+        return MapRole(role);
+    }
+
+    public async Task<bool> DeleteRole(Guid roleId)
+    {
+        var tableClient = await GetTableClient();
+
+        // Find the role first to get its ProjectId
+        var allRoles = tableClient.Query<RoleEntity>(e => e.Id == roleId);
+        var roleEntity = allRoles.FirstOrDefault();
+
+        if (roleEntity == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            // Delete the role
+            var partitionKey = RoleEntity.EntityPartitionKeyPrefix + roleEntity.ProjectId;
+            await tableClient.DeleteEntityAsync(partitionKey, roleId.ToString());
+
+            // Delete all members of the role
+            var roleMemberPartitionKey = RoleMemberEntity.EntityPartitionKeyPrefix + roleId;
+            var members = tableClient.Query<RoleMemberEntity>(e => e.PartitionKey == roleMemberPartitionKey);
+
+            foreach (var member in members)
+            {
+                await tableClient.DeleteEntityAsync(roleMemberPartitionKey, member.UserId);
+            }
+
+            return true;
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            return false;
+        }
+    }
+
+    public async Task<IReadOnlyList<RoleMember>> GetRoleMembers(Guid roleId)
+    {
+        var tableClient = await GetTableClient();
+
+        var partitionKey = RoleMemberEntity.EntityPartitionKeyPrefix + roleId;
+        var members = tableClient.Query<RoleMemberEntity>(e => e.PartitionKey == partitionKey);
+
+        return members.Select(MapRoleMember).ToArray();
+    }
+
+    public async Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string email)
+    {
+        var member = new RoleMemberEntity
+        {
+            RoleId = roleId,
+            UserId = userId,
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email
+        };
+
+        var tableClient = await GetTableClient();
+        await tableClient.UpsertEntityAsync(member);
+
+        return MapRoleMember(member);
+    }
+
+    public async Task<bool> RemoveRoleMember(Guid roleId, string userId)
+    {
+        var tableClient = await GetTableClient();
+        var partitionKey = RoleMemberEntity.EntityPartitionKeyPrefix + roleId;
+
+        try
+        {
+            await tableClient.DeleteEntityAsync(partitionKey, userId);
+            return true;
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            return false;
+        }
+    }
+
+    private static Role MapRole(RoleEntity role)
+    {
+        return new Role
+        {
+            Id = role.Id,
+            ProjectId = role.ProjectId,
+            Name = role.Name
+        };
+    }
+
+    private static RoleMember MapRoleMember(RoleMemberEntity member)
+    {
+        return new RoleMember
+        {
+            RoleId = member.RoleId,
+            UserId = member.UserId,
+            FirstName = member.FirstName,
+            LastName = member.LastName,
+            Email = member.Email
+        };
+    }
 }

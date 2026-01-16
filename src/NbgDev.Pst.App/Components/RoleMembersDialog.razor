@@ -1,0 +1,49 @@
+@using NbgDev.Pst.App.Models
+@using NbgDev.Pst.App.Services
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">Role Members - @Role.Name</MudText>
+    </TitleContent>
+    <DialogContent>
+        <div class="d-flex justify-end mb-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="OpenAddMemberDialog" Size="Size.Small">
+                Add Member
+            </MudButton>
+        </div>
+
+        @if (_isLoading)
+        {
+            <MudProgressCircular Indeterminate="true" />
+        }
+        else if (_members == null || !_members.Any())
+        {
+            <MudText>No members assigned to this role yet.</MudText>
+        }
+        else
+        {
+            <MudTable Items="_members" Hover="true" Striped="true" Dense="true">
+                <HeaderContent>
+                    <MudTh>First Name</MudTh>
+                    <MudTh>Last Name</MudTh>
+                    <MudTh>Email</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="First Name">@context.FirstName</MudTd>
+                    <MudTd DataLabel="Last Name">@context.LastName</MudTd>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete" 
+                                       Color="Color.Error" 
+                                       OnClick="@(() => ConfirmRemoveMember(context))"
+                                       Size="Size.Small" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Close">Close</MudButton>
+    </DialogActions>
+</MudDialog>
