@@ -13,7 +13,8 @@ internal class RoleEntity : ITableEntity
 
     public required string Name { get; set; }
 
-    public required string Description { get; set; }
+    // Not marked as 'required' for backward compatibility with existing roles in Azure Table Storage
+    public string Description { get; set; } = string.Empty;
 
     public string PartitionKey
     {
