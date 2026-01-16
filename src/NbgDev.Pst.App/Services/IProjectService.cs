@@ -5,6 +5,7 @@ namespace NbgDev.Pst.App.Services;
 public interface IProjectService
 {
     event Action<Project>? ProjectCreated;
+    event Action<Guid>? ProjectDeleted;
 
     Task<IReadOnlyList<Project>> GetProjects();
 
