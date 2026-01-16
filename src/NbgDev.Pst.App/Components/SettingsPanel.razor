@@ -1,0 +1,40 @@
+@using NbgDev.Pst.App.Models
+
+<div class="pa-4">
+    <MudText Typo="Typo.h6" Class="mb-4">Danger Zone</MudText>
+    <MudButton Color="Color.Error" 
+               Variant="Variant.Filled" 
+               OnClick="OpenDeleteDialog"
+               StartIcon="@Icons.Material.Filled.Delete">
+        Delete Project
+    </MudButton>
+</div>
+
+<MudDialog @bind-Visible="_deleteDialogVisible" Options="_dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Warning" Class="mr-3" Color="Color.Warning" /> Confirm Deletion
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudText>Are you sure you want to delete the project <strong>@Project?.Name</strong>?</MudText>
+        <MudText Class="mt-2">This action cannot be undone. The project and its associated security group will be permanently deleted.</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseDeleteDialog" Disabled="@_isDeleting">Cancel</MudButton>
+        <MudButton Color="Color.Error" 
+                   Variant="Variant.Filled" 
+                   OnClick="DeleteProject"
+                   Disabled="@_isDeleting">
+            @if (_isDeleting)
+            {
+                <MudProgressCircular Class="mr-2" Size="Size.Small" Indeterminate="true" />
+                <span>Deleting...</span>
+            }
+            else
+            {
+                <span>Delete</span>
+            }
+        </MudButton>
+    </DialogActions>
+</MudDialog>
