@@ -82,7 +82,7 @@ public partial class AddRoleMemberDialog
                 .Where(m => 
                     m.FirstName.ToLowerInvariant().Contains(searchLower) ||
                     m.LastName.ToLowerInvariant().Contains(searchLower) ||
-                    m.Email.ToLowerInvariant().Contains(searchLower))
+                    (m.Email?.ToLowerInvariant().Contains(searchLower) ?? false))
                 .ToList();
         }
     }

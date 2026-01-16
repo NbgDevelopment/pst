@@ -31,7 +31,7 @@
                             </MudAvatar>
                             <div>
                                 <MudText Typo="Typo.body1">@member.FirstName @member.LastName</MudText>
-                                <MudText Typo="Typo.body2" Color="Color.Secondary">@member.Email</MudText>
+                                <MudText Typo="Typo.body2" Color="Color.Secondary">@(member.Email ?? "No email")</MudText>
                             </div>
                         </div>
                     </MudListItem>

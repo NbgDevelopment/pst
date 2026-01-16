@@ -10,5 +10,5 @@ public class EntraIdUserDto
 
     public required string Surname { get; set; }
 
-    public required string Mail { get; set; }
+    public string? Mail { get; set; }
 }

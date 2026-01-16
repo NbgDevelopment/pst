@@ -16,7 +16,7 @@ internal interface IProjectService
 
     Task<IReadOnlyList<ProjectMember>> GetProjectMembers(Guid projectId);
 
-    Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string email);
+    Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string? email);
 
     Task<bool> RemoveProjectMember(Guid projectId, string userId);
 
@@ -28,7 +28,7 @@ internal interface IProjectService
 
     Task<IReadOnlyList<RoleMember>> GetRoleMembers(Guid roleId);
 
-    Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string email);
+    Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string? email);
 
     Task<bool> RemoveRoleMember(Guid roleId, string userId);
 }

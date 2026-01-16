@@ -27,11 +27,6 @@ public class ProjectMemberController(IMediator mediator, IEventPublisher eventPu
             return ValidationProblem("User ID may not be null or empty");
         }
 
-        if (string.IsNullOrWhiteSpace(dto.Email))
-        {
-            return ValidationProblem("Email may not be null or empty");
-        }
-
         var member = await mediator.Send(new AddProjectMemberRequest(
             projectId,
             dto.UserId,

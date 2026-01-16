@@ -6,7 +6,7 @@ public interface IProjectMemberService
 {
     Task<IReadOnlyList<ProjectMember>> GetProjectMembers(Guid projectId);
 
-    Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string email);
+    Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string? email);
 
     Task RemoveProjectMember(Guid projectId, string userId);
 }
