@@ -8,5 +8,5 @@ public record AddRoleMemberRequest(
     string UserId,
     string FirstName,
     string LastName,
-    string Email
+    string? Email
 ) : IRequest<RoleMember>;

@@ -32,7 +32,7 @@
                 <RowTemplate>
                     <MudTd DataLabel="First Name">@context.FirstName</MudTd>
                     <MudTd DataLabel="Last Name">@context.LastName</MudTd>
-                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Email">@(context.Email ?? "No email")</MudTd>
                     <MudTd DataLabel="Actions">
                         <MudIconButton Icon="@Icons.Material.Filled.Delete" 
                                        Color="Color.Error" 

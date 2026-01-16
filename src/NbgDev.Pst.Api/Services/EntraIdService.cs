@@ -22,7 +22,7 @@ public class EntraIdService(GraphServiceClient graphClient) : IEntraIdService
             });
 
         return users?.Value?
-            .Where(u => u.Mail != null && u.GivenName != null && u.Surname != null)
+            .Where(u => u.GivenName != null && u.Surname != null)
             .Select(Map)
             .ToList() ?? new List<EntraIdUser>();
     }
@@ -35,7 +35,7 @@ public class EntraIdService(GraphServiceClient graphClient) : IEntraIdService
             DisplayName = user.DisplayName ?? string.Empty,
             GivenName = user.GivenName ?? string.Empty,
             Surname = user.Surname ?? string.Empty,
-            Mail = user.Mail ?? string.Empty
+            Mail = user.Mail
         };
     }
 }

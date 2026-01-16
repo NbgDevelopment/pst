@@ -101,7 +101,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return members.Select(MapMember).ToArray();
     }
 
-    public async Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string email)
+    public async Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string? email)
     {
         var member = new ProjectMemberEntity
         {
@@ -250,7 +250,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return members.Select(MapRoleMember).ToArray();
     }
 
-    public async Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string email)
+    public async Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string? email)
     {
         var member = new RoleMemberEntity
         {
