@@ -17,7 +17,7 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
     {
         var tableClient = await GetTableClient();
 
-        return tableClient.Query<ProjectEntity>()
+        return tableClient.Query<ProjectEntity>(e => e.PartitionKey == ProjectEntity.EntityPartitionKey)
             .Select(Map)
             .ToArray();
     }
