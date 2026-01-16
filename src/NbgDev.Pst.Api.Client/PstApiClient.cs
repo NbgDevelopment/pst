@@ -1,5 +1,7 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 
 namespace NbgDev.Pst.Api.Client;
@@ -7,6 +9,8 @@ namespace NbgDev.Pst.Api.Client;
 public class PstApiClient
 {
     public required IAccessTokenProvider AccessTokenProvider { get; init; }
+    public required NavigationManager NavigationManager { get; init; }
+    
     protected async Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, string url, CancellationToken cancellationToken)
     {
         await PrepareRequestAsync(request);
@@ -17,7 +21,15 @@ public class PstApiClient
         await PrepareRequestAsync(request);
     }
 
-    protected Task ProcessResponseAsync(HttpClient client, HttpResponseMessage request, CancellationToken cancellationToken) => Task.CompletedTask;
+    protected Task ProcessResponseAsync(HttpClient client, HttpResponseMessage response, CancellationToken cancellationToken)
+    {
+        if (response.StatusCode == HttpStatusCode.Unauthorized)
+        {
+            NavigationManager.NavigateToLogout("authentication/logout");
+        }
+        
+        return Task.CompletedTask;
+    }
 
     private async Task PrepareRequestAsync(HttpRequestMessage request)
     {
