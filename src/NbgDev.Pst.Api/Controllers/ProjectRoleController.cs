@@ -45,7 +45,12 @@ public class ProjectRoleController(IMediator mediator, IEventPublisher eventPubl
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> DeleteRole(Guid projectId, Guid roleId)
     {
-        await mediator.Send(new DeleteRoleRequest(roleId));
+        var deleted = await mediator.Send(new DeleteRoleRequest(roleId));
+
+        if (!deleted)
+        {
+            return NotFound();
+        }
 
         await eventPublisher.PublishAsync(new ProjectRoleDeletedEvent
         {

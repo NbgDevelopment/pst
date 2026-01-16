@@ -58,7 +58,12 @@ public class ProjectRoleMemberController(IMediator mediator, IEventPublisher eve
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult> RemoveMember(Guid roleId, string userId)
     {
-        await mediator.Send(new RemoveRoleMemberRequest(roleId, userId));
+        var removed = await mediator.Send(new RemoveRoleMemberRequest(roleId, userId));
+
+        if (!removed)
+        {
+            return NotFound();
+        }
 
         await eventPublisher.PublishAsync(new ProjectMemberRemovedFromRoleEvent
         {

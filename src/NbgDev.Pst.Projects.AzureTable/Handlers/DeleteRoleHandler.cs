@@ -4,10 +4,10 @@ using NbgDev.Pst.Projects.Contract.Requests;
 
 namespace NbgDev.Pst.Projects.AzureTable.Handlers;
 
-internal class DeleteRoleHandler(IProjectService projectService) : IRequestHandler<DeleteRoleRequest>
+internal class DeleteRoleHandler(IProjectService projectService) : IRequestHandler<DeleteRoleRequest, bool>
 {
-    public async Task Handle(DeleteRoleRequest request, CancellationToken cancellationToken)
+    public async Task<bool> Handle(DeleteRoleRequest request, CancellationToken cancellationToken)
     {
-        await projectService.DeleteRole(request.RoleId);
+        return await projectService.DeleteRole(request.RoleId);
     }
 }
