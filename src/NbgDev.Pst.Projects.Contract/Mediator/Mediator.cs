@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using System.Collections.Concurrent;
 
 namespace NbgDev.Pst.Projects.Contract.Mediator;
 
@@ -7,7 +8,10 @@ namespace NbgDev.Pst.Projects.Contract.Mediator;
 /// </summary>
 internal sealed class Mediator(IServiceProvider serviceProvider) : IMediator
 {
-    public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+    private delegate Task<object> HandlerDelegate(object handler, object request, CancellationToken cancellationToken);
+    private static readonly ConcurrentDictionary<Type, HandlerDelegate> _handlerCache = new();
+
+    public async Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
     {
         if (request == null)
         {
@@ -19,20 +23,28 @@ internal sealed class Mediator(IServiceProvider serviceProvider) : IMediator
         
         var handler = serviceProvider.GetRequiredService(handlerType);
         
-        var handleMethod = handlerType.GetMethod(nameof(IRequestHandler<IRequest<TResponse>, TResponse>.Handle));
-        
-        if (handleMethod == null)
+        // Get or create the compiled delegate for this handler type
+        var invoker = _handlerCache.GetOrAdd(handlerType, ht =>
         {
-            throw new InvalidOperationException($"Handle method not found on handler for request type {requestType.Name}");
-        }
+            var handleMethod = ht.GetMethod(nameof(IRequestHandler<IRequest<TResponse>, TResponse>.Handle));
+            
+            if (handleMethod == null)
+            {
+                throw new InvalidOperationException($"Handle method not found on handler type {ht.Name}");
+            }
 
-        var result = handleMethod.Invoke(handler, [request, cancellationToken]);
+            return async (h, r, ct) =>
+            {
+                var result = handleMethod.Invoke(h, [r, ct]);
+                if (result is Task<TResponse> task)
+                {
+                    return await task;
+                }
+                throw new InvalidOperationException($"Handler did not return expected Task<TResponse>");
+            };
+        });
         
-        if (result is Task<TResponse> task)
-        {
-            return task;
-        }
-
-        throw new InvalidOperationException($"Handler for {requestType.Name} did not return a Task<{typeof(TResponse).Name}>");
+        var responseObj = await invoker(handler, request, cancellationToken);
+        return (TResponse)responseObj!;
     }
 }
