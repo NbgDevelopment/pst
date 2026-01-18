@@ -28,14 +28,14 @@ public partial class CreateRoleDialog
 
     private async Task CreateRole()
     {
-        if (string.IsNullOrWhiteSpace(_roleName) || string.IsNullOrWhiteSpace(_roleDescription))
+        if (string.IsNullOrWhiteSpace(_roleName))
         {
             return;
         }
 
         try
         {
-            await ProjectRoleService.CreateRole(ProjectId, _roleName, _roleDescription);
+            await ProjectRoleService.CreateRole(ProjectId, _roleName, _roleDescription ?? string.Empty);
             DialogInstance?.Close(DialogResult.Ok(true));
         }
         catch (Exception ex)

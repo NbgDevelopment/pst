@@ -14,14 +14,13 @@
                           Required="true"
                           Class="mb-3" />
             <MudTextField @bind-Value="_roleDescription" 
-                          Label="Description" 
+                          Label="Description (optional)" 
                           Variant="Variant.Outlined"
-                          Required="true"
                           Class="mb-3" />
             <MudButton Variant="Variant.Filled" 
                        Color="Color.Primary" 
                        OnClick="UpdateRole" 
-                       Disabled="@(string.IsNullOrWhiteSpace(_roleName) || string.IsNullOrWhiteSpace(_roleDescription) || (_roleName == Role.Name && _roleDescription == Role.Description))"
+                       Disabled="@(string.IsNullOrWhiteSpace(_roleName) || (_roleName == Role.Name && _roleDescription == Role.Description))"
                        Size="Size.Small">
                 Update Role
             </MudButton>

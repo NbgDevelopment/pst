@@ -57,14 +57,14 @@ public partial class ManageRoleDialog
 
     private async Task UpdateRole()
     {
-        if (string.IsNullOrWhiteSpace(_roleName) || string.IsNullOrWhiteSpace(_roleDescription))
+        if (string.IsNullOrWhiteSpace(_roleName))
         {
             return;
         }
 
         try
         {
-            var updatedRole = await ProjectRoleService.UpdateRole(Role.ProjectId, Role.Id, _roleName, _roleDescription);
+            var updatedRole = await ProjectRoleService.UpdateRole(Role.ProjectId, Role.Id, _roleName, _roleDescription ?? string.Empty);
             if (updatedRole != null)
             {
                 // Update local fields to reflect the saved values
