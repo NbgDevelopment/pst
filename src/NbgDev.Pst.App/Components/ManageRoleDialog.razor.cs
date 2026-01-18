@@ -5,13 +5,16 @@ using NbgDev.Pst.App.Services;
 
 namespace NbgDev.Pst.App.Components;
 
-public partial class RoleMembersDialog
+public partial class ManageRoleDialog
 {
     [Parameter]
     public required Role Role { get; set; }
 
     [Inject]
     private IRoleMemberService RoleMemberService { get; set; } = default!;
+
+    [Inject]
+    private IProjectRoleService ProjectRoleService { get; set; } = default!;
 
     [Inject]
     private IDialogService DialogService { get; set; } = default!;
@@ -21,12 +24,16 @@ public partial class RoleMembersDialog
 
     private List<RoleMember> _members = new();
     private bool _isLoading = true;
+    private string _roleName = string.Empty;
+    private string _roleDescription = string.Empty;
 
     [CascadingParameter]
     public IMudDialogInstance? DialogInstance { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
+        _roleName = Role.Name;
+        _roleDescription = Role.Description;
         await LoadMembers();
     }
 
@@ -45,6 +52,34 @@ public partial class RoleMembersDialog
         finally
         {
             _isLoading = false;
+        }
+    }
+
+    private async Task UpdateRole()
+    {
+        if (string.IsNullOrWhiteSpace(_roleName))
+        {
+            return;
+        }
+
+        try
+        {
+            var updatedRole = await ProjectRoleService.UpdateRole(Role.ProjectId, Role.Id, _roleName, _roleDescription ?? string.Empty);
+            if (updatedRole != null)
+            {
+                // Update local fields to reflect the saved values
+                _roleName = updatedRole.Name;
+                _roleDescription = updatedRole.Description;
+                Snackbar.Add("Role updated successfully", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Failed to update role: Role not found", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to update role: {ex.Message}", Severity.Error);
         }
     }
 
@@ -97,6 +132,6 @@ public partial class RoleMembersDialog
 
     private void Close()
     {
-        DialogInstance?.Close();
+        DialogInstance?.Close(DialogResult.Ok(true));
     }
 }

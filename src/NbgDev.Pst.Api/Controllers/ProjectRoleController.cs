@@ -27,14 +27,44 @@ public class ProjectRoleController(IMediator mediator, IEventPublisher eventPubl
             return ValidationProblem("Role name may not be null or empty");
         }
 
-        var role = await mediator.Send(new CreateRoleRequest(projectId, dto.Name));
+        var role = await mediator.Send(new CreateRoleRequest(projectId, dto.Name, dto.Description ?? string.Empty));
 
         await eventPublisher.PublishAsync(new ProjectRoleCreatedEvent
         {
             EventType = nameof(ProjectRoleCreatedEvent),
             RoleId = role.Id,
             ProjectId = role.ProjectId,
-            Name = role.Name
+            Name = role.Name,
+            Description = role.Description
+        });
+
+        return Ok(Map(role));
+    }
+
+    [HttpPut("{roleId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<RoleDto>> UpdateRole(Guid projectId, Guid roleId, [FromBody] UpdateRoleDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            return ValidationProblem("Role name may not be null or empty");
+        }
+
+        var role = await mediator.Send(new UpdateRoleRequest(roleId, dto.Name, dto.Description ?? string.Empty));
+
+        if (role == null)
+        {
+            return NotFound();
+        }
+
+        await eventPublisher.PublishAsync(new ProjectRoleUpdatedEvent
+        {
+            EventType = nameof(ProjectRoleUpdatedEvent),
+            RoleId = role.Id,
+            ProjectId = role.ProjectId,
+            Name = role.Name,
+            Description = role.Description
         });
 
         return Ok(Map(role));
@@ -68,7 +98,8 @@ public class ProjectRoleController(IMediator mediator, IEventPublisher eventPubl
         {
             Id = role.Id,
             ProjectId = role.ProjectId,
-            Name = role.Name
+            Name = role.Name,
+            Description = role.Description
         };
     }
 }

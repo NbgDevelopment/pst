@@ -1,6 +1,6 @@
 namespace NbgDev.Pst.Api.Dtos;
 
-public class CreateRoleDto
+public class UpdateRoleDto
 {
     public required string Name { get; set; }
 

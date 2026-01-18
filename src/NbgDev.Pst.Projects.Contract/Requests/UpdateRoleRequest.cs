@@ -3,8 +3,8 @@ using NbgDev.Pst.Projects.Contract.Models;
 
 namespace NbgDev.Pst.Projects.Contract.Requests;
 
-public record CreateRoleRequest(
-    Guid ProjectId,
+public record UpdateRoleRequest(
+    Guid RoleId,
     string Name,
     string Description
-) : IRequest<Role>;
+) : IRequest<Role?>;

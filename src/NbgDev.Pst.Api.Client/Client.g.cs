@@ -1207,6 +1207,13 @@ namespace NbgDev.Pst.Api.Client
         System.Threading.Tasks.Task<RoleDto> CreateRoleAsync(System.Guid projectId, CreateRoleDto dto, System.Threading.CancellationToken cancellationToken);
 
         /// <exception cref="PstApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<RoleDto> UpdateRoleAsync(System.Guid projectId, System.Guid roleId, UpdateRoleDto dto);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="PstApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<RoleDto> UpdateRoleAsync(System.Guid projectId, System.Guid roleId, UpdateRoleDto dto, System.Threading.CancellationToken cancellationToken);
+
+        /// <exception cref="PstApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task DeleteRoleAsync(System.Guid projectId, System.Guid roleId);
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
@@ -1398,6 +1405,108 @@ namespace NbgDev.Pst.Api.Client
                                 throw new PstApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new PstApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <exception cref="PstApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<RoleDto> UpdateRoleAsync(System.Guid projectId, System.Guid roleId, UpdateRoleDto dto)
+        {
+            return UpdateRoleAsync(projectId, roleId, dto, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <exception cref="PstApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<RoleDto> UpdateRoleAsync(System.Guid projectId, System.Guid roleId, UpdateRoleDto dto, System.Threading.CancellationToken cancellationToken)
+        {
+            if (projectId == null)
+                throw new System.ArgumentNullException("projectId");
+
+            if (roleId == null)
+                throw new System.ArgumentNullException("roleId");
+
+            if (dto == null)
+                throw new System.ArgumentNullException("dto");
+
+            var client_ = _httpClient;
+            var disposeClient_ = false;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var json_ = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(dto, JsonSerializerSettings);
+                    var content_ = new System.Net.Http.ByteArrayContent(json_);
+                    content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse("application/json");
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("PUT");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    var urlBuilder_ = new System.Text.StringBuilder();
+                    if (!string.IsNullOrEmpty(_baseUrl)) urlBuilder_.Append(_baseUrl);
+                    // Operation Path: "api/project/{projectId}/roles/{roleId}"
+                    urlBuilder_.Append("api/project/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(projectId, System.Globalization.CultureInfo.InvariantCulture)));
+                    urlBuilder_.Append("/roles/");
+                    urlBuilder_.Append(System.Uri.EscapeDataString(ConvertToString(roleId, System.Globalization.CultureInfo.InvariantCulture)));
+
+                    await PrepareRequestAsync(client_, request_, urlBuilder_, cancellationToken).ConfigureAwait(false);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    await PrepareRequestAsync(client_, request_, url_, cancellationToken).ConfigureAwait(false);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = new System.Collections.Generic.Dictionary<string, System.Collections.Generic.IEnumerable<string>>();
+                        foreach (var item_ in response_.Headers)
+                            headers_[item_.Key] = item_.Value;
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        await ProcessResponseAsync(client_, response_, cancellationToken).ConfigureAwait(false);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 200)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<RoleDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new PstApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 404)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<ProblemDetails>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new PstApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new PstApiException<ProblemDetails>("A server side error occurred.", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         {
@@ -2422,6 +2531,9 @@ namespace NbgDev.Pst.Api.Client
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; } = default!;
 
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; } = default!;
+
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
@@ -2430,6 +2542,21 @@ namespace NbgDev.Pst.Api.Client
 
         [System.Text.Json.Serialization.JsonPropertyName("name")]
         public string Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; } = default!;
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.2.0.0 (NJsonSchema v11.1.0.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateRoleDto
+    {
+
+        [System.Text.Json.Serialization.JsonPropertyName("name")]
+        public string Name { get; set; } = default!;
+
+        [System.Text.Json.Serialization.JsonPropertyName("description")]
+        public string Description { get; set; } = default!;
 
     }
 

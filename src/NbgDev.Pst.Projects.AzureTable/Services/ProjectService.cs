@@ -189,19 +189,49 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return roles.Select(MapRole).ToArray();
     }
 
-    public async Task<Role> CreateRole(Guid projectId, string name)
+    public async Task<Role> CreateRole(Guid projectId, string name, string description)
     {
         var role = new RoleEntity
         {
             Id = Guid.NewGuid(),
             ProjectId = projectId,
-            Name = name
+            Name = name,
+            Description = description
         };
 
         var tableClient = await GetTableClient();
         await tableClient.AddEntityAsync(role);
 
         return MapRole(role);
+    }
+
+    public async Task<Role?> UpdateRole(Guid roleId, string name, string description)
+    {
+        var tableClient = await GetTableClient();
+
+        // Find the role first to get its ProjectId
+        var allRoles = tableClient.Query<RoleEntity>(e => e.Id == roleId);
+        var roleEntity = allRoles.FirstOrDefault();
+
+        if (roleEntity == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            // Update the role
+            roleEntity.Name = name;
+            roleEntity.Description = description;
+            
+            await tableClient.UpdateEntityAsync(roleEntity, roleEntity.ETag);
+
+            return MapRole(roleEntity);
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            return null;
+        }
     }
 
     public async Task<bool> DeleteRole(Guid roleId)
@@ -289,7 +319,8 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         {
             Id = role.Id,
             ProjectId = role.ProjectId,
-            Name = role.Name
+            Name = role.Name,
+            Description = role.Description
         };
     }
 

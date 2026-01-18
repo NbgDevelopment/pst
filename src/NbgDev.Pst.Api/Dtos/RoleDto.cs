@@ -7,4 +7,6 @@ public class RoleDto
     public required Guid ProjectId { get; set; }
 
     public required string Name { get; set; }
+
+    public string Description { get; set; } = string.Empty;
 }

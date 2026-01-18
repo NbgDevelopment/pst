@@ -22,7 +22,9 @@ internal interface IProjectService
 
     Task<IReadOnlyList<Role>> GetRoles(Guid projectId);
 
-    Task<Role> CreateRole(Guid projectId, string name);
+    Task<Role> CreateRole(Guid projectId, string name, string description);
+
+    Task<Role?> UpdateRole(Guid roleId, string name, string description);
 
     Task<bool> DeleteRole(Guid roleId);
 

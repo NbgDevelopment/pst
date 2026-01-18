@@ -16,6 +16,7 @@ public partial class CreateRoleDialog
     private ISnackbar Snackbar { get; set; } = default!;
 
     private string _roleName = string.Empty;
+    private string _roleDescription = string.Empty;
 
     [CascadingParameter]
     public IMudDialogInstance? DialogInstance { get; set; }
@@ -34,7 +35,7 @@ public partial class CreateRoleDialog
 
         try
         {
-            await ProjectRoleService.CreateRole(ProjectId, _roleName);
+            await ProjectRoleService.CreateRole(ProjectId, _roleName, _roleDescription ?? string.Empty);
             DialogInstance?.Close(DialogResult.Ok(true));
         }
         catch (Exception ex)
