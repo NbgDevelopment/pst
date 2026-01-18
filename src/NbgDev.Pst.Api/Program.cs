@@ -46,12 +46,12 @@ builder.Services.AddMediatR(config =>
     config.RegisterServicesFromAssemblyContaining(typeof(Program));
 });
 
-builder.AddAzureTableClient("Projects");
+builder.AddAzureTableServiceClient("Projects");
 builder.Services.AddProjectsAzureTable();
 builder.Services.AddScoped<IEntraIdService, EntraIdService>();
 
-builder.AddAzureQueueClient("ApiQueues");
-builder.AddAzureQueueClient("ProcessingQueues");
+builder.AddAzureQueueServiceClient("ApiQueues");
+builder.AddAzureQueueServiceClient("ProcessingQueues");
 builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IEventHandler, ProjectCreatedProcessedEventHandler>();
 builder.Services.AddHostedService<EventProcessor>();

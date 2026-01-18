@@ -7,8 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
 
-builder.AddAzureQueueClient("ApiQueues");
-builder.AddAzureQueueClient("ProcessingQueues");
+builder.AddAzureQueueServiceClient("ApiQueues");
+builder.AddAzureQueueServiceClient("ProcessingQueues");
 
 // Configure GraphServiceClient with app-only authentication (client credentials)
 builder.Services.AddSingleton<GraphServiceClient>(sp =>
