@@ -24,6 +24,8 @@ internal interface IProjectService
 
     Task<Role> CreateRole(Guid projectId, string name, string description);
 
+    Task<Role?> UpdateRole(Guid roleId, string name, string description);
+
     Task<bool> DeleteRole(Guid roleId);
 
     Task<IReadOnlyList<RoleMember>> GetRoleMembers(Guid roleId);

@@ -46,6 +46,31 @@ public class ProjectRoleController(IMediator mediator, IEventPublisher eventPubl
         return Ok(Map(role));
     }
 
+    [HttpPut("{roleId}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<RoleDto>> UpdateRole(Guid projectId, Guid roleId, [FromBody] UpdateRoleDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+        {
+            return ValidationProblem("Role name may not be null or empty");
+        }
+
+        if (string.IsNullOrWhiteSpace(dto.Description))
+        {
+            return ValidationProblem("Role description may not be null or empty");
+        }
+
+        var role = await mediator.Send(new UpdateRoleRequest(roleId, dto.Name, dto.Description));
+
+        if (role == null)
+        {
+            return NotFound();
+        }
+
+        return Ok(Map(role));
+    }
+
     [HttpDelete("{roleId}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

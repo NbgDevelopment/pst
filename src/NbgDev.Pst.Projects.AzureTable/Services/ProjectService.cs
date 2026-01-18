@@ -205,6 +205,36 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
         return MapRole(role);
     }
 
+    public async Task<Role?> UpdateRole(Guid roleId, string name, string description)
+    {
+        var tableClient = await GetTableClient();
+
+        // Find the role first to get its ProjectId
+        var allRoles = tableClient.Query<RoleEntity>(e => e.Id == roleId);
+        var roleEntity = allRoles.FirstOrDefault();
+
+        if (roleEntity == null)
+        {
+            return null;
+        }
+
+        try
+        {
+            // Update the role
+            roleEntity.Name = name;
+            roleEntity.Description = description;
+            
+            var partitionKey = RoleEntity.EntityPartitionKeyPrefix + roleEntity.ProjectId;
+            await tableClient.UpdateEntityAsync(roleEntity, roleEntity.ETag);
+
+            return MapRole(roleEntity);
+        }
+        catch (Azure.RequestFailedException ex) when (ex.Status == 404)
+        {
+            return null;
+        }
+    }
+
     public async Task<bool> DeleteRole(Guid roleId)
     {
         var tableClient = await GetTableClient();

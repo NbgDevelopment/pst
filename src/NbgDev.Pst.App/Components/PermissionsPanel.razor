@@ -41,10 +41,10 @@
                 <MudTd DataLabel="Role Name">@context.Name</MudTd>
                 <MudTd DataLabel="Description">@context.Description</MudTd>
                 <MudTd DataLabel="Actions">
-                    <MudTooltip Text="Manage Members">
-                        <MudIconButton Icon="@Icons.Material.Filled.People" 
+                    <MudTooltip Text="Manage Role">
+                        <MudIconButton Icon="@Icons.Material.Filled.Settings" 
                                        Color="Color.Primary" 
-                                       OnClick="@(() => OpenRoleMembersDialog(context))"
+                                       OnClick="@(() => OpenManageRoleDialog(context))"
                                        Size="Size.Small" />
                     </MudTooltip>
                     <MudTooltip Text="Delete Role">

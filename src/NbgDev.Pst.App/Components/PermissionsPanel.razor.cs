@@ -69,15 +69,21 @@ public partial class PermissionsPanel
         }
     }
 
-    private async Task OpenRoleMembersDialog(Role role)
+    private async Task OpenManageRoleDialog(Role role)
     {
-        var parameters = new DialogParameters<RoleMembersDialog>
+        var parameters = new DialogParameters<ManageRoleDialog>
         {
             { x => x.Role, role }
         };
 
         var options = new DialogOptions { CloseButton = true, MaxWidth = MaxWidth.Medium, FullWidth = true };
-        await DialogService.ShowAsync<RoleMembersDialog>($"Manage Members - {role.Name}", parameters, options);
+        var result = await DialogService.ShowAsync<ManageRoleDialog>($"Manage Role - {role.Name}", parameters, options);
+        
+        var dialogResult = await result.Result;
+        if (dialogResult != null && !dialogResult.Canceled)
+        {
+            await LoadRoles();
+        }
     }
 
     private async Task ConfirmDeleteRole(Role role)

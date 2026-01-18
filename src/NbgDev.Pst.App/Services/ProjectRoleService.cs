@@ -23,6 +23,25 @@ public class ProjectRoleService(IProjectRoleClient projectRoleClient) : IProject
         return Map(result);
     }
 
+    public async Task<Role?> UpdateRole(Guid projectId, Guid roleId, string name, string description)
+    {
+        var dto = new UpdateRoleDto
+        {
+            Name = name,
+            Description = description
+        };
+
+        try
+        {
+            var result = await projectRoleClient.UpdateRoleAsync(projectId, roleId, dto);
+            return Map(result);
+        }
+        catch (PstApiException ex) when (ex.StatusCode == 404)
+        {
+            return null;
+        }
+    }
+
     public async Task DeleteRole(Guid projectId, Guid roleId)
     {
         await projectRoleClient.DeleteRoleAsync(projectId, roleId);
