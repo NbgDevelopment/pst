@@ -224,7 +224,6 @@ internal class ProjectService(TableServiceClient tableServiceClient) : IProjectS
             roleEntity.Name = name;
             roleEntity.Description = description;
             
-            var partitionKey = RoleEntity.EntityPartitionKeyPrefix + roleEntity.ProjectId;
             await tableClient.UpdateEntityAsync(roleEntity, roleEntity.ETag);
 
             return MapRole(roleEntity);

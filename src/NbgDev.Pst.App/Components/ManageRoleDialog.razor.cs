@@ -67,10 +67,10 @@ public partial class ManageRoleDialog
             var updatedRole = await ProjectRoleService.UpdateRole(Role.ProjectId, Role.Id, _roleName, _roleDescription);
             if (updatedRole != null)
             {
-                Role.Name = updatedRole.Name;
-                Role.Description = updatedRole.Description;
+                // Update local fields to reflect the saved values
+                _roleName = updatedRole.Name;
+                _roleDescription = updatedRole.Description;
                 Snackbar.Add("Role updated successfully", Severity.Success);
-                StateHasChanged();
             }
             else
             {
