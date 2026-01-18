@@ -11,7 +11,7 @@ public class RoleMemberService(IProjectRoleMemberClient roleMemberClient) : IRol
         return members.Select(Map).ToList();
     }
 
-    public async Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string email)
+    public async Task<RoleMember> AddRoleMember(Guid roleId, string userId, string firstName, string lastName, string? email)
     {
         var dto = new AddRoleMemberDto
         {

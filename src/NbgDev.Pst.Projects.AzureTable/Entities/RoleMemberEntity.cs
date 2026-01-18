@@ -15,7 +15,7 @@ internal class RoleMemberEntity : ITableEntity
 
     public required string LastName { get; set; }
 
-    public required string Email { get; set; }
+    public string? Email { get; set; }
 
     public string PartitionKey
     {

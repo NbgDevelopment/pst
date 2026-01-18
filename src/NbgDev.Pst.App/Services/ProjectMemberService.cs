@@ -11,7 +11,7 @@ public class ProjectMemberService(IProjectMemberClient projectMemberClient) : IP
         return members.Select(Map).ToList();
     }
 
-    public async Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string email)
+    public async Task<ProjectMember> AddProjectMember(Guid projectId, string userId, string firstName, string lastName, string? email)
     {
         var dto = new AddProjectMemberDto
         {

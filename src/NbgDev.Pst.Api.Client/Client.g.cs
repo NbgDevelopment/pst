@@ -2403,7 +2403,7 @@ namespace NbgDev.Pst.Api.Client
         public string Surname { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("mail")]
-        public string Mail { get; set; } = default!;
+        public string? Mail { get; set; } = default!;
 
     }
 
@@ -2496,7 +2496,7 @@ namespace NbgDev.Pst.Api.Client
         public string LastName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("email")]
-        public string Email { get; set; } = default!;
+        public string? Email { get; set; } = default!;
 
     }
 
@@ -2514,7 +2514,7 @@ namespace NbgDev.Pst.Api.Client
         public string LastName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("email")]
-        public string Email { get; set; } = default!;
+        public string? Email { get; set; } = default!;
 
     }
 
@@ -2577,7 +2577,7 @@ namespace NbgDev.Pst.Api.Client
         public string LastName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("email")]
-        public string Email { get; set; } = default!;
+        public string? Email { get; set; } = default!;
 
     }
 
@@ -2595,7 +2595,7 @@ namespace NbgDev.Pst.Api.Client
         public string LastName { get; set; } = default!;
 
         [System.Text.Json.Serialization.JsonPropertyName("email")]
-        public string Email { get; set; } = default!;
+        public string? Email { get; set; } = default!;
 
     }
 
