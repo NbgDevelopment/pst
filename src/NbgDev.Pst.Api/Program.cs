@@ -5,6 +5,7 @@ using Microsoft.Identity.Web;
 using NbgDev.Pst.Api.Services;
 using NbgDev.Pst.Api.Services.EventHandlers;
 using NbgDev.Pst.Projects.AzureTable;
+using NbgDev.Pst.Projects.Contract.Mediator;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,11 +41,9 @@ builder.Services.AddSingleton<GraphServiceClient>(sp =>
     return new GraphServiceClient(credential);
 });
 
-builder.Services.AddMediatR(config =>
-{
-    config.RegisterServicesFromAssemblyContaining(typeof(BootstrapProjectsAzureTable));
-    config.RegisterServicesFromAssemblyContaining(typeof(Program));
-});
+builder.Services.AddMediator(
+    typeof(BootstrapProjectsAzureTable).Assembly,
+    typeof(Program).Assembly);
 
 builder.AddAzureTableServiceClient("Projects");
 builder.Services.AddProjectsAzureTable();
