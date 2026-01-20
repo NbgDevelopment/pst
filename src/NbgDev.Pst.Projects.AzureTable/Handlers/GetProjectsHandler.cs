@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using NbgDev.Pst.Projects.Contract.Mediator;
 using NbgDev.Pst.Projects.AzureTable.Services;
 using NbgDev.Pst.Projects.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Requests;

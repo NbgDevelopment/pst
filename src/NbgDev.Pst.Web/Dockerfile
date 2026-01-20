@@ -1,5 +1,5 @@
 # This stage is used to build the service project
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["NbgDev.Pst.Web/NbgDev.Pst.Web.csproj", "NbgDev.Pst.Web/"]

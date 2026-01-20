@@ -1,4 +1,4 @@
-using MediatR;
+using NbgDev.Pst.Projects.Contract.Mediator;
 using Microsoft.AspNetCore.Mvc;
 using NbgDev.Pst.Api.Dtos;
 using NbgDev.Pst.Api.Services;

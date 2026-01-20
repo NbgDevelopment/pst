@@ -5,6 +5,7 @@ using Microsoft.Identity.Web;
 using NbgDev.Pst.Api.Services;
 using NbgDev.Pst.Api.Services.EventHandlers;
 using NbgDev.Pst.Projects.AzureTable;
+using NbgDev.Pst.Projects.Contract.Mediator;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,18 +41,16 @@ builder.Services.AddSingleton<GraphServiceClient>(sp =>
     return new GraphServiceClient(credential);
 });
 
-builder.Services.AddMediatR(config =>
-{
-    config.RegisterServicesFromAssemblyContaining(typeof(BootstrapProjectsAzureTable));
-    config.RegisterServicesFromAssemblyContaining(typeof(Program));
-});
+builder.Services.AddMediator(
+    typeof(BootstrapProjectsAzureTable).Assembly,
+    typeof(Program).Assembly);
 
-builder.AddAzureTableClient("Projects");
+builder.AddAzureTableServiceClient("Projects");
 builder.Services.AddProjectsAzureTable();
 builder.Services.AddScoped<IEntraIdService, EntraIdService>();
 
-builder.AddAzureQueueClient("ApiQueues");
-builder.AddAzureQueueClient("ProcessingQueues");
+builder.AddAzureQueueServiceClient("ApiQueues");
+builder.AddAzureQueueServiceClient("ProcessingQueues");
 builder.Services.AddScoped<IEventPublisher, EventPublisher>();
 builder.Services.AddScoped<IEventHandler, ProjectCreatedProcessedEventHandler>();
 builder.Services.AddHostedService<EventProcessor>();

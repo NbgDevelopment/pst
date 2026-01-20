@@ -1,4 +1,4 @@
-using MediatR;
+using NbgDev.Pst.Projects.Contract.Mediator;
 using NbgDev.Pst.Events.Contract.Base;
 using NbgDev.Pst.Events.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Models;

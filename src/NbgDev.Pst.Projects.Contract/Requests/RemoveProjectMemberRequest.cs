@@ -1,4 +1,4 @@
-using MediatR;
+using NbgDev.Pst.Projects.Contract.Mediator;
 
 namespace NbgDev.Pst.Projects.Contract.Requests;
 

@@ -1,4 +1,4 @@
-using MediatR;
+using NbgDev.Pst.Projects.Contract.Mediator;
 using NbgDev.Pst.Api.Services;
 using NbgDev.Pst.Projects.Contract.Models;
 using NbgDev.Pst.Projects.Contract.Requests;
