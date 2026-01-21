@@ -2,13 +2,13 @@
 using System.Net.Http.Headers;
 using System.Text;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.Identity.Abstractions;
 
 namespace NbgDev.Pst.Api.Client;
 
 public class PstApiClient
 {
-    public required IAccessTokenProvider AccessTokenProvider { get; init; }
+    public required IAuthorizationHeaderProvider AuthorizationHeaderProvider { get; init; }
     public required NavigationManager NavigationManager { get; init; }
     
     protected async Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, string url, CancellationToken cancellationToken)
@@ -25,7 +25,7 @@ public class PstApiClient
     {
         if (response.StatusCode == HttpStatusCode.Unauthorized)
         {
-            NavigationManager.NavigateToLogout("authentication/logout");
+            NavigationManager.NavigateTo("MicrosoftIdentity/Account/SignOut", forceLoad: true);
         }
         
         return Task.CompletedTask;
@@ -33,10 +33,13 @@ public class PstApiClient
 
     private async Task PrepareRequestAsync(HttpRequestMessage request)
     {
-        var accessTokenResult = await AccessTokenProvider.RequestAccessToken();
-        if (accessTokenResult.TryGetToken(out var accessToken))
+        var authorizationHeader = await AuthorizationHeaderProvider.CreateAuthorizationHeaderForUserAsync(
+            scopes: [],
+            cancellationToken: CancellationToken.None);
+        
+        if (!string.IsNullOrEmpty(authorizationHeader))
         {
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken.Value);
+            request.Headers.Add("Authorization", authorizationHeader);
         }
     }
 }
