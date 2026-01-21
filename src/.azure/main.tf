@@ -28,6 +28,15 @@ module "container-environment" {
   workspace_id        = module.monitoring.workspace_id
 }
 
+module "redis" {
+  source                       = "./resources/redis"
+  stage                        = var.stage
+  location                     = azurerm_resource_group.rg.location
+  resource_group_name          = azurerm_resource_group.rg.name
+  tags                         = local.tags
+  container_app_environment_id = module.container-environment.container_app_environment_id
+}
+
 module "api" {
   source                           = "./resources/api"
   stage                            = var.stage
@@ -76,4 +85,5 @@ module "web" {
   registry_username            = var.registry_username
   registry_password            = var.registry_password
   api_url                      = module.api.api_fqdn
+  redis_connection_string      = module.redis.redis_connection_string
 }

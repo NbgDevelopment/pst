@@ -20,9 +20,21 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMudServices();
 
 // Add distributed cache for token persistence across app restarts
-// For development: use in-memory distributed cache
-// For production: consider Redis, SQL Server, or Cosmos DB
-builder.Services.AddDistributedMemoryCache();
+// Use Redis for production-grade distributed caching
+var redisConnectionString = builder.Configuration.GetConnectionString("redis");
+if (!string.IsNullOrEmpty(redisConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = "PstTokenCache:";
+    });
+}
+else
+{
+    // Fallback to in-memory distributed cache for local development without Redis
+    builder.Services.AddDistributedMemoryCache();
+}
 
 // Add Azure AD authentication
 // Get the authentication cookie expiration configuration once
