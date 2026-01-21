@@ -17,7 +17,9 @@ builder.Services.AddMudServices();
 
 // Add Azure AD authentication
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddInMemoryTokenCaches();
 
 builder.Services.AddControllersWithViews()
     .AddMicrosoftIdentityUI();
