@@ -89,37 +89,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     
     // Keep the cookie persistent across browser sessions
     options.Cookie.IsEssential = true;
-    
-    // Validate principal to handle token cache desynchronization
-    options.Events = new CookieAuthenticationEvents
-    {
-        OnValidatePrincipal = async context =>
-        {
-            try
-            {
-                // Attempt to silently acquire a token to validate the cached tokens exist
-                var tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
-                
-                // Use a minimal scope that should always be available
-                await tokenAcquisition.GetAccessTokenForUserAsync(
-                    scopes: Array.Empty<string>(),
-                    user: context.Principal);
-            }
-            catch (MicrosoftIdentityWebChallengeUserException ex) 
-                when (ex.InnerException is MsalUiRequiredException msalEx && 
-                      msalEx.ErrorCode == "user_null")
-            {
-                // Token cache doesn't have the user - reject the principal and sign out
-                // This happens after app restart when tokens are lost
-                context.RejectPrincipal();
-                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            }
-            catch
-            {
-                // Ignore other exceptions - they'll be handled by the consent handler
-            }
-        }
-    };
 });
 
 builder.Services.AddControllersWithViews()
