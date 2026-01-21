@@ -285,6 +285,67 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 5. **Monitor Authentication**: Enable Azure AD sign-in logs and monitoring
 6. **Use Managed Identity**: Where possible, use managed identity for Azure resources
 
+## Persistent Login Configuration
+
+The application is configured to maintain login state across browser sessions. This means users remain authenticated even after closing and reopening their browser, as long as their Azure AD tokens are valid or can be refreshed.
+
+### Configuration Settings
+
+The persistent login behavior is controlled in `src/NbgDev.Pst.Web/Program.cs` and `appsettings.json`:
+
+**Program.cs Configuration:**
+```csharp
+// Enable persistent cookies
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(options =>
+    {
+        builder.Configuration.GetSection("AzureAd").Bind(options);
+        options.SaveTokens = true;  // Persist tokens for refresh
+    })
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddInMemoryTokenCaches();
+
+// Configure cookie persistence
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+        ? CookieSecurePolicy.SameAsRequest 
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    
+    var expireDays = builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
+    options.ExpireTimeSpan = TimeSpan.FromDays(expireDays);
+    options.SlidingExpiration = true;
+    options.Cookie.IsEssential = true;
+});
+```
+
+**appsettings.json Configuration:**
+```json
+{
+  "AuthenticationCookieExpireDays": 7
+}
+```
+
+### Customizing Cookie Expiration
+
+To change the duration of persistent login:
+
+1. Edit `appsettings.json` and modify the `AuthenticationCookieExpireDays` value
+2. For environment-specific settings, override in `appsettings.Development.json` or `appsettings.Production.json`
+3. Recommended values:
+   - Development: 7-14 days
+   - Production: 7 days (balance between UX and security)
+
+### Security Considerations
+
+- **Sliding Expiration**: The cookie expiration extends with each request, keeping active users logged in
+- **Token Refresh**: Azure AD refresh tokens are automatically used to acquire new access tokens
+- **Secure Cookies**: In production, cookies are only transmitted over HTTPS
+- **HttpOnly**: Cookies are inaccessible to client-side JavaScript, preventing XSS attacks
+- **SameSite**: Lax setting provides CSRF protection while maintaining usability
+
 ## Additional Resources
 
 - [Microsoft Identity Platform documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/)
