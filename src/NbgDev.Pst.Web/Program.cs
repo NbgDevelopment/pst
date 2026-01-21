@@ -19,6 +19,11 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
+// Add distributed cache for token persistence across app restarts
+// For development: use in-memory distributed cache
+// For production: consider Redis, SQL Server, or Cosmos DB
+builder.Services.AddDistributedMemoryCache();
+
 // Add Azure AD authentication
 // Get the authentication cookie expiration configuration once
 var authCookieExpireDays = Math.Clamp(
@@ -52,7 +57,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         };
     })
     .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddInMemoryTokenCaches();
+    .AddDistributedTokenCaches();
 
 // Configure cookie authentication to persist across browser sessions
 builder.Services.ConfigureApplicationCookie(options =>
@@ -70,38 +75,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     
     // Keep the cookie persistent across browser sessions
     options.Cookie.IsEssential = true;
-    
-    // Handle cookie validation to reject desynchronized cookies
-    // This prevents MicrosoftIdentityWebChallengeUserException when token cache is empty
-    options.Events = new CookieAuthenticationEvents
-    {
-        OnValidatePrincipal = async context =>
-        {
-            try
-            {
-                // Attempt to get an access token to validate the cached tokens exist
-                var tokenAcquisition = context.HttpContext.RequestServices.GetRequiredService<ITokenAcquisition>();
-                
-                // Try to get a token for a basic scope (user.read is commonly available)
-                await tokenAcquisition.GetAccessTokenForUserAsync(
-                    scopes: new[] { "User.Read" },
-                    user: context.Principal);
-            }
-            catch (MicrosoftIdentityWebChallengeUserException ex) 
-                when (ex.InnerException is MsalUiRequiredException msalEx && 
-                      (msalEx.ErrorCode == "user_null" || msalEx.ErrorCode == "invalid_grant"))
-            {
-                // Token cache doesn't have the user's tokens (e.g., after app restart with in-memory cache)
-                // Reject the principal to force re-authentication
-                context.RejectPrincipal();
-                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            }
-            catch
-            {
-                // Ignore other exceptions - let the application handle them normally
-            }
-        }
-    };
 });
 
 builder.Services.AddControllersWithViews()
