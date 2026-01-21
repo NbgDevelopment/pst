@@ -26,9 +26,23 @@ var processing = builder.AddProject<Projects.NbgDev_Pst_Processing>("nbgdev-pst-
     .WaitFor(apiQueues)
     .WaitFor(processingQueues);
 
-builder.AddProject<Projects.NbgDev_Pst_Web>("web", (string?)null)
-    .AddWebAssemblyProject("web", api, "PstApi:ApiUrl")
-    .WithHttpsEndpoint(7004, name: "rest", isProxied: false)
+var web = builder.AddProject<Projects.NbgDev_Pst_Web>("web")
+    .WithEnvironment(ctx =>
+    {
+        if (api.Resource.TryGetEndpoints(out var endpoints))
+        {
+            var allocatedEndpoints = endpoints
+                .Where(e => e.AllocatedEndpoint is not null)
+                .Select(e => e.AllocatedEndpoint!)
+                .ToList();
+
+            if (allocatedEndpoints.Count > 0)
+            {
+                var apiUrl = allocatedEndpoints.First().UriString;
+                ctx.EnvironmentVariables["PstApi__ApiUrl"] = apiUrl;
+            }
+        }
+    })
     .WaitFor(api);
 
 builder.Build().Run();
