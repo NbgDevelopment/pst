@@ -43,7 +43,6 @@ var web = builder.AddProject<Projects.NbgDev_Pst_Web>("web")
             }
         }
     })
-    .WithHttpsEndpoint(7004, name: "rest", isProxied: false)
     .WaitFor(api);
 
 builder.Build().Run();
