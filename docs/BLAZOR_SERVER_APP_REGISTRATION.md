@@ -301,6 +301,26 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     {
         builder.Configuration.GetSection("AzureAd").Bind(options);
         options.SaveTokens = true;  // Persist tokens for refresh
+        
+        // Configure the authentication ticket to be persistent
+        options.Events = new OpenIdConnectEvents
+        {
+            OnTicketReceived = context =>
+            {
+                // Make the authentication ticket persistent across browser sessions
+                if (context.Properties != null)
+                {
+                    context.Properties.IsPersistent = true;
+                    
+                    var expireDays = context.HttpContext.RequestServices
+                        .GetRequiredService<IConfiguration>()
+                        .GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
+                    expireDays = Math.Clamp(expireDays, 1, 30);
+                    context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(expireDays);
+                }
+                return Task.CompletedTask;
+            }
+        };
     })
     .EnableTokenAcquisitionToCallDownstreamApi()
     .AddInMemoryTokenCaches();
