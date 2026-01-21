@@ -1,5 +1,4 @@
-﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@inject NavigationManager Navigation
+﻿@inject NavigationManager Navigation
 
 <AuthorizeView>
     <Authorized>
@@ -7,13 +6,13 @@
         <MudButton Class="nav-link btn btn-link" Color="Color.Inherit" OnClick="BeginLogOut">Log out</MudButton>
     </Authorized>
     <NotAuthorized>
-        <MudLink Color="Color.Inherit" Href="authentication/login">Log in</MudLink>
+        <MudLink Color="Color.Inherit" Href="MicrosoftIdentity/Account/SignIn">Log in</MudLink>
     </NotAuthorized>
 </AuthorizeView>
 
 @code{
     public void BeginLogOut()
     {
-        Navigation.NavigateToLogout("authentication/logout");
+        Navigation.NavigateTo("MicrosoftIdentity/Account/SignOut", forceLoad: true);
     }
 }
