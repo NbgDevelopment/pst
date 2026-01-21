@@ -13,12 +13,12 @@ public class PstApiClient
     
     protected async Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, string url, CancellationToken cancellationToken)
     {
-        await PrepareRequestAsync(request);
+        await PrepareRequestAsync(request, cancellationToken);
     }
 
     protected async Task PrepareRequestAsync(HttpClient client, HttpRequestMessage request, StringBuilder urlBuilder, CancellationToken cancellationToken)
     {
-        await PrepareRequestAsync(request);
+        await PrepareRequestAsync(request, cancellationToken);
     }
 
     protected Task ProcessResponseAsync(HttpClient client, HttpResponseMessage response, CancellationToken cancellationToken)
@@ -31,11 +31,11 @@ public class PstApiClient
         return Task.CompletedTask;
     }
 
-    private async Task PrepareRequestAsync(HttpRequestMessage request)
+    private async Task PrepareRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
     {
         var authorizationHeader = await AuthorizationHeaderProvider.CreateAuthorizationHeaderForUserAsync(
             scopes: [],
-            cancellationToken: CancellationToken.None);
+            cancellationToken: cancellationToken);
         
         if (!string.IsNullOrEmpty(authorizationHeader))
         {
