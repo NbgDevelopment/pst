@@ -9,13 +9,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 Console.WriteLine($"BaseUrl: {builder.Environment.ContentRootPath}");
 
-// Load backend configuration
-var backendConfigPath = Path.Combine(builder.Environment.WebRootPath, "appsettings.backend.json");
-if (File.Exists(backendConfigPath))
-{
-    builder.Configuration.AddJsonFile(backendConfigPath, optional: true, reloadOnChange: true);
-}
-
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
