@@ -337,6 +337,35 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(authCookieExpireDays);
     options.SlidingExpiration = true;
     options.Cookie.IsEssential = true;
+    
+    // Handle cookie validation to reject desynchronized cookies
+    // Prevents MicrosoftIdentityWebChallengeUserException when token cache is empty
+    options.Events = new CookieAuthenticationEvents
+    {
+        OnValidatePrincipal = async context =>
+        {
+            try
+            {
+                var tokenAcquisition = context.HttpContext.RequestServices
+                    .GetRequiredService<ITokenAcquisition>();
+                await tokenAcquisition.GetAccessTokenForUserAsync(
+                    scopes: new[] { "User.Read" },
+                    user: context.Principal);
+            }
+            catch (MicrosoftIdentityWebChallengeUserException ex) 
+                when (ex.InnerException is MsalUiRequiredException msalEx && 
+                      (msalEx.ErrorCode == "user_null" || msalEx.ErrorCode == "invalid_grant"))
+            {
+                // Token cache doesn't have user tokens - force re-authentication
+                context.RejectPrincipal();
+                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            }
+            catch
+            {
+                // Ignore other exceptions
+            }
+        }
+    };
 });
 ```
 
@@ -346,6 +375,22 @@ builder.Services.ConfigureApplicationCookie(options =>
   "AuthenticationCookieExpireDays": 7
 }
 ```
+
+### Token Cache Desynchronization Handling
+
+When using in-memory token caches (`.AddInMemoryTokenCaches()`) with persistent cookies, there's a potential issue:
+- **Scenario**: User logs in, app stores a persistent cookie, then the app restarts
+- **Problem**: The in-memory token cache is empty, but the browser still has the persistent cookie
+- **Result**: When trying to acquire tokens, a `MicrosoftIdentityWebChallengeUserException` (IDW10502) is thrown
+
+**Solution**: The `OnValidatePrincipal` event handler validates that the token cache has the user's tokens. If not (error codes `user_null` or `invalid_grant`), it:
+1. Rejects the principal
+2. Signs out the user  
+3. Forces re-authentication, which repopulates the token cache
+
+This provides a seamless user experience - users are automatically prompted to re-authenticate when needed, rather than encountering an error.
+
+**Note**: For production environments with multiple instances or frequent restarts, consider using a distributed token cache (e.g., Redis, SQL Server) instead of in-memory caching by replacing `.AddInMemoryTokenCaches()` with `.AddDistributedTokenCaches()`.
 
 ### Customizing Cookie Expiration
 
