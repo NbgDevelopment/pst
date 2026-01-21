@@ -17,6 +17,11 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMudServices();
 
 // Add Azure AD authentication
+// Get the authentication cookie expiration configuration once
+var authCookieExpireDays = Math.Clamp(
+    builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7,
+    1, 30);
+
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(options =>
     {
@@ -36,11 +41,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                     context.Properties.IsPersistent = true;
                     
                     // Set the expiration time for the authentication ticket
-                    var expireDays = context.HttpContext.RequestServices
-                        .GetRequiredService<IConfiguration>()
-                        .GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
-                    expireDays = Math.Clamp(expireDays, 1, 30);
-                    context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(expireDays);
+                    context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(authCookieExpireDays);
                 }
                 
                 return Task.CompletedTask;
@@ -60,11 +61,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SameSite = SameSiteMode.Lax;
     
     // Make cookies persistent - survive browser close
-    // Default to 7 days, can be configured via AuthenticationCookieExpireDays in appsettings
-    // Valid range: 1-30 days for security and usability
-    var expireDays = builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
-    expireDays = Math.Clamp(expireDays, 1, 30);
-    options.ExpireTimeSpan = TimeSpan.FromDays(expireDays);
+    // Use the same expiration as the authentication ticket
+    options.ExpireTimeSpan = TimeSpan.FromDays(authCookieExpireDays);
     options.SlidingExpiration = true;
     
     // Keep the cookie persistent across browser sessions

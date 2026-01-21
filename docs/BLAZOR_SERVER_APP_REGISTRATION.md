@@ -295,6 +295,11 @@ The persistent login behavior is controlled in `src/NbgDev.Pst.Web/Program.cs` a
 
 **Program.cs Configuration:**
 ```csharp
+// Get the authentication cookie expiration configuration once
+var authCookieExpireDays = Math.Clamp(
+    builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7,
+    1, 30);
+
 // Enable persistent cookies
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(options =>
@@ -311,12 +316,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
                 if (context.Properties != null)
                 {
                     context.Properties.IsPersistent = true;
-                    
-                    var expireDays = context.HttpContext.RequestServices
-                        .GetRequiredService<IConfiguration>()
-                        .GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
-                    expireDays = Math.Clamp(expireDays, 1, 30);
-                    context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(expireDays);
+                    context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(authCookieExpireDays);
                 }
                 return Task.CompletedTask;
             }
@@ -334,8 +334,7 @@ builder.Services.ConfigureApplicationCookie(options =>
         : CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Lax;
     
-    var expireDays = builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
-    options.ExpireTimeSpan = TimeSpan.FromDays(expireDays);
+    options.ExpireTimeSpan = TimeSpan.FromDays(authCookieExpireDays);
     options.SlidingExpiration = true;
     options.Cookie.IsEssential = true;
 });
