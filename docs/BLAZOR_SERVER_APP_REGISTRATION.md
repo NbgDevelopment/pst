@@ -373,18 +373,31 @@ builder.Services.AddDistributedMemoryCache(); // For development
 
 #### Cache Options
 
-**Development:**
-- `AddDistributedMemoryCache()` - Simple memory-based cache (shown above)
-- Note: Still loses tokens on restart, but works better than in-memory cache
+**This Application (Implemented):**
+The application is configured to use **Redis** for distributed token caching:
 
-**Production:**
-- **Redis** (Recommended):
-  ```csharp
-  builder.Services.AddStackExchangeRedisCache(options =>
-  {
-      options.Configuration = builder.Configuration.GetConnectionString("Redis");
-  });
-  ```
+```csharp
+var redisConnectionString = builder.Configuration.GetConnectionString("redis");
+if (!string.IsNullOrEmpty(redisConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = "PstTokenCache:";
+    });
+}
+else
+{
+    // Fallback for local development without Redis
+    builder.Services.AddDistributedMemoryCache();
+}
+```
+
+**Infrastructure:**
+- **Development (AppHost)**: Redis runs as container with Docker volume
+- **Production (Azure)**: Redis deployed as Azure Container App with Azure File persistence
+
+**Alternative Options:**
 - **SQL Server**:
   ```csharp
   builder.Services.AddDistributedSqlServerCache(options =>
