@@ -32,11 +32,15 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+        ? CookieSecurePolicy.SameAsRequest 
+        : CookieSecurePolicy.Always;
     options.Cookie.SameSite = SameSiteMode.Lax;
     
     // Make cookies persistent - survive browser close
-    options.ExpireTimeSpan = TimeSpan.FromDays(7);
+    // Default to 7 days, can be configured via AuthenticationCookieExpireDays in appsettings
+    var expireDays = builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
+    options.ExpireTimeSpan = TimeSpan.FromDays(expireDays);
     options.SlidingExpiration = true;
     
     // Keep the cookie persistent across browser sessions
