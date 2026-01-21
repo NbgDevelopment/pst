@@ -21,7 +21,8 @@ public static class Bootstrap
             return new ProjectClient(options.Value.ApiUrl, new HttpClient())
             {
                 AuthorizationHeaderProvider = authorizationHeaderProvider,
-                NavigationManager = navigationManager
+                NavigationManager = navigationManager,
+                Options = options
             };
         });
 
@@ -33,7 +34,8 @@ public static class Bootstrap
             return new ProjectMemberClient(options.Value.ApiUrl, new HttpClient())
             {
                 AuthorizationHeaderProvider = authorizationHeaderProvider,
-                NavigationManager = navigationManager
+                NavigationManager = navigationManager,
+                Options = options
             };
         });
 
@@ -45,7 +47,8 @@ public static class Bootstrap
             return new EntraIdClient(options.Value.ApiUrl, new HttpClient())
             {
                 AuthorizationHeaderProvider = authorizationHeaderProvider,
-                NavigationManager = navigationManager
+                NavigationManager = navigationManager,
+                Options = options
             };
         });
 
@@ -57,7 +60,8 @@ public static class Bootstrap
             return new ProjectRoleClient(options.Value.ApiUrl, new HttpClient())
             {
                 AuthorizationHeaderProvider = authorizationHeaderProvider,
-                NavigationManager = navigationManager
+                NavigationManager = navigationManager,
+                Options = options
             };
         });
 
@@ -69,7 +73,8 @@ public static class Bootstrap
             return new ProjectRoleMemberClient(options.Value.ApiUrl, new HttpClient())
             {
                 AuthorizationHeaderProvider = authorizationHeaderProvider,
-                NavigationManager = navigationManager
+                NavigationManager = navigationManager,
+                Options = options
             };
         });
 

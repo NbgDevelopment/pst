@@ -1,6 +1,6 @@
 ﻿namespace NbgDev.Pst.Api.Client;
 
-internal class PstApiClientOptions
+public class PstApiClientOptions
 {
     public required string ApiUrl { get; set; }
 
