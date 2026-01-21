@@ -39,7 +39,9 @@ public class PstApiClient
         
         if (!string.IsNullOrEmpty(authorizationHeader))
         {
-            request.Headers.Add("Authorization", authorizationHeader);
+            // Remove any existing Authorization header before adding new one
+            request.Headers.Remove("Authorization");
+            request.Headers.TryAddWithoutValidation("Authorization", authorizationHeader);
         }
     }
 }
