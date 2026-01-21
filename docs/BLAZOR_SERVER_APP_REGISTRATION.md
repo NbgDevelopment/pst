@@ -300,6 +300,9 @@ var authCookieExpireDays = Math.Clamp(
     builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7,
     1, 30);
 
+// Add distributed cache for token persistence across app restarts
+builder.Services.AddDistributedMemoryCache();
+
 // Enable persistent cookies
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(options =>
@@ -323,7 +326,7 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
         };
     })
     .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddInMemoryTokenCaches();
+    .AddDistributedTokenCaches(); // Use distributed cache to persist tokens
 
 // Configure cookie persistence
 builder.Services.ConfigureApplicationCookie(options =>
@@ -337,35 +340,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.ExpireTimeSpan = TimeSpan.FromDays(authCookieExpireDays);
     options.SlidingExpiration = true;
     options.Cookie.IsEssential = true;
-    
-    // Handle cookie validation to reject desynchronized cookies
-    // Prevents MicrosoftIdentityWebChallengeUserException when token cache is empty
-    options.Events = new CookieAuthenticationEvents
-    {
-        OnValidatePrincipal = async context =>
-        {
-            try
-            {
-                var tokenAcquisition = context.HttpContext.RequestServices
-                    .GetRequiredService<ITokenAcquisition>();
-                await tokenAcquisition.GetAccessTokenForUserAsync(
-                    scopes: new[] { "User.Read" },
-                    user: context.Principal);
-            }
-            catch (MicrosoftIdentityWebChallengeUserException ex) 
-                when (ex.InnerException is MsalUiRequiredException msalEx && 
-                      (msalEx.ErrorCode == "user_null" || msalEx.ErrorCode == "invalid_grant"))
-            {
-                // Token cache doesn't have user tokens - force re-authentication
-                context.RejectPrincipal();
-                await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            }
-            catch
-            {
-                // Ignore other exceptions
-            }
-        }
-    };
 });
 ```
 
@@ -376,21 +350,53 @@ builder.Services.ConfigureApplicationCookie(options =>
 }
 ```
 
-### Token Cache Desynchronization Handling
+### Token Cache Configuration
 
-When using in-memory token caches (`.AddInMemoryTokenCaches()`) with persistent cookies, there's a potential issue:
-- **Scenario**: User logs in, app stores a persistent cookie, then the app restarts
-- **Problem**: The in-memory token cache is empty, but the browser still has the persistent cookie
-- **Result**: When trying to acquire tokens, a `MicrosoftIdentityWebChallengeUserException` (IDW10502) is thrown
+**Important**: This implementation uses a **distributed token cache** instead of in-memory caching to prevent `MicrosoftIdentityWebChallengeUserException` (IDW10502) errors.
 
-**Solution**: The `OnValidatePrincipal` event handler validates that the token cache has the user's tokens. If not (error codes `user_null` or `invalid_grant`), it:
-1. Rejects the principal
-2. Signs out the user  
-3. Forces re-authentication, which repopulates the token cache
+#### Why Distributed Cache?
 
-This provides a seamless user experience - users are automatically prompted to re-authenticate when needed, rather than encountering an error.
+When using persistent cookies with in-memory token caches:
+- **Problem**: App restart clears the in-memory token cache, but persistent cookies remain
+- **Result**: User appears authenticated (has cookie) but token acquisition fails (cache empty)
+- **Error**: `MicrosoftIdentityWebChallengeUserException: IDW10502`
 
-**Note**: For production environments with multiple instances or frequent restarts, consider using a distributed token cache (e.g., Redis, SQL Server) instead of in-memory caching by replacing `.AddInMemoryTokenCaches()` with `.AddDistributedTokenCaches()`.
+**Solution**: Use `.AddDistributedTokenCaches()` with a distributed cache provider:
+
+```csharp
+// Add distributed cache
+builder.Services.AddDistributedMemoryCache(); // For development
+
+// Use distributed token cache
+.AddDistributedTokenCaches();
+```
+
+#### Cache Options
+
+**Development:**
+- `AddDistributedMemoryCache()` - Simple memory-based cache (shown above)
+- Note: Still loses tokens on restart, but works better than in-memory cache
+
+**Production:**
+- **Redis** (Recommended):
+  ```csharp
+  builder.Services.AddStackExchangeRedisCache(options =>
+  {
+      options.Configuration = builder.Configuration.GetConnectionString("Redis");
+  });
+  ```
+- **SQL Server**:
+  ```csharp
+  builder.Services.AddDistributedSqlServerCache(options =>
+  {
+      options.ConnectionString = builder.Configuration.GetConnectionString("TokenCache");
+      options.SchemaName = "dbo";
+      options.TableName = "TokenCache";
+  });
+  ```
+- **Azure Cosmos DB** or other `IDistributedCache` implementations
+
+This ensures tokens persist across app restarts and scales to multiple server instances.
 
 ### Customizing Cookie Expiration
 
