@@ -334,7 +334,8 @@ To change the duration of persistent login:
 
 1. Edit `appsettings.json` and modify the `AuthenticationCookieExpireDays` value
 2. For environment-specific settings, override in `appsettings.Development.json` or `appsettings.Production.json`
-3. Recommended values:
+3. Valid range: 1-30 days (values outside this range will be clamped)
+4. Recommended values:
    - Development: 7-14 days
    - Production: 7 days (balance between UX and security)
 

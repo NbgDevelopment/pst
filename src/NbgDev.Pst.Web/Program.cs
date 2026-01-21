@@ -39,7 +39,9 @@ builder.Services.ConfigureApplicationCookie(options =>
     
     // Make cookies persistent - survive browser close
     // Default to 7 days, can be configured via AuthenticationCookieExpireDays in appsettings
+    // Valid range: 1-30 days for security and usability
     var expireDays = builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7;
+    expireDays = Math.Clamp(expireDays, 1, 30);
     options.ExpireTimeSpan = TimeSpan.FromDays(expireDays);
     options.SlidingExpiration = true;
     
