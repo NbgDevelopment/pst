@@ -43,3 +43,9 @@ variable "api_url" {
     error_message = "API URL must be a valid HTTP/HTTPS URL."
   }
 }
+
+variable "redis_connection_string" {
+  type        = string
+  description = "The Redis connection string for distributed caching"
+  sensitive   = true
+}

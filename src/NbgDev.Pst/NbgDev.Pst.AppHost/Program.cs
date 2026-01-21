@@ -2,6 +2,9 @@ using NbgDev.Pst.AppHost;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
+var redis = builder.AddRedis("redis")
+    .WithDataVolume(); // Persist data between restarts
+
 var storage = builder.AddAzureStorage("Storage")
     .RunAsEmulator(container =>
     {
@@ -27,6 +30,7 @@ var processing = builder.AddProject<Projects.NbgDev_Pst_Processing>("nbgdev-pst-
     .WaitFor(processingQueues);
 
 var web = builder.AddProject<Projects.NbgDev_Pst_Web>("web")
+    .WithReference(redis)
     .WithEnvironment(ctx =>
     {
         if (api.Resource.TryGetEndpoints(out var endpoints))

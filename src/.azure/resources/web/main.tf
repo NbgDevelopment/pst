@@ -25,12 +25,21 @@ resource "azurerm_container_app" "web" {
         name  = "API_URL"
         value = var.api_url
       }
+      env {
+        name        = "ConnectionStrings__redis"
+        secret_name = "redis-connection-string"
+      }
     }
   }
 
   secret {
     name  = "registry-password"
     value = var.registry_password
+  }
+
+  secret {
+    name  = "redis-connection-string"
+    value = var.redis_connection_string
   }
 
   registry {

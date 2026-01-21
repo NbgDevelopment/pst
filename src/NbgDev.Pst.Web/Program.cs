@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Microsoft.Identity.Abstractions;
+using Microsoft.Identity.Client;
 using NbgDev.Pst.App;
 using NbgDev.Pst.Web.Components;
 using MudBlazor.Services;
@@ -15,17 +19,86 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
+// Add distributed cache for token persistence across app restarts
+// Use Redis for production-grade distributed caching
+var redisConnectionString = builder.Configuration.GetConnectionString("redis");
+if (!string.IsNullOrEmpty(redisConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = "PstTokenCache:";
+    });
+}
+else
+{
+    // Fallback to in-memory distributed cache for local development without Redis
+    builder.Services.AddDistributedMemoryCache();
+}
+
 // Add Azure AD authentication
+// Get the authentication cookie expiration configuration once
+var authCookieExpireDays = Math.Clamp(
+    builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7,
+    1, 30);
+
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"))
-    .EnableTokenAcquisitionToCallDownstreamApi()
-    .AddInMemoryTokenCaches();
+    .AddMicrosoftIdentityWebApp(options =>
+    {
+        builder.Configuration.GetSection("AzureAd").Bind(options);
+        
+        // Enable persistent cookies to keep login state across browser restarts
+        options.SaveTokens = true;
+        
+        // Configure the authentication ticket to be persistent
+        options.Events = new OpenIdConnectEvents
+        {
+            OnTicketReceived = context =>
+            {
+                // Make the authentication ticket persistent across browser sessions
+                if (context.Properties != null)
+                {
+                    context.Properties.IsPersistent = true;
+                    
+                    // Set the expiration time for the authentication ticket
+                    context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(authCookieExpireDays);
+                }
+                
+                return Task.CompletedTask;
+            }
+        };
+    })
+    .EnableTokenAcquisitionToCallDownstreamApi(new[] {
+        builder.Configuration["PstApi:Scope"] ?? ""
+    })
+    .AddDistributedTokenCaches();
+
+// Configure cookie authentication to persist across browser sessions
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+        ? CookieSecurePolicy.SameAsRequest 
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    
+    // Make cookies persistent - survive browser close
+    // Use the same expiration as the authentication ticket
+    options.ExpireTimeSpan = TimeSpan.FromDays(authCookieExpireDays);
+    options.SlidingExpiration = true;
+    
+    // Keep the cookie persistent across browser sessions
+    options.Cookie.IsEssential = true;
+});
 
 builder.Services.AddControllersWithViews()
     .AddMicrosoftIdentityUI();
 
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
+
+// Add consent handler for incremental consent scenarios
+builder.Services.AddMicrosoftIdentityConsentHandler();
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<HttpClient>(sp =>
