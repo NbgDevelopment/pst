@@ -2,6 +2,12 @@
 
 This directory contains OpenSCAD models designed for 3D printing to support development teams using the PST (Project Setup Tool). These models provide practical solutions for organizing workspaces, labeling equipment, and improving ergonomics.
 
+## Quick Links
+
+- **[Visual Guide](VISUAL_GUIDE.md)** - See ASCII diagrams and use cases for each model
+- **[Quick Reference](QUICK_REFERENCE.md)** - Fast parameter lookup and troubleshooting
+- **[Config File](openscad/config.scad)** - Centralized configuration for all models
+
 ## Available Models
 
 ### 1. Cable Organizer (`cable_organizer.scad`)
@@ -158,6 +164,10 @@ This directory contains OpenSCAD models designed for 3D printing to support deve
 
 ### Customization Tips
 
+- **Global Configuration:** Use the `config.scad` file to set parameters for all models at once
+  - Edit `openscad/config.scad` with your preferences
+  - Uncomment the `use <config.scad>` line in individual model files
+  - All models will use consistent sizing and branding
 - **Scaling:** All models can be scaled in your slicer if you need different sizes
 - **Colors:** Print in different colors for organizational purposes
 - **Multi-material:** Some models can benefit from multi-color prints for labels
