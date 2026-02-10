@@ -285,6 +285,151 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
 5. **Monitor Authentication**: Enable Azure AD sign-in logs and monitoring
 6. **Use Managed Identity**: Where possible, use managed identity for Azure resources
 
+## Persistent Login Configuration
+
+The application is configured to maintain login state across browser sessions. This means users remain authenticated even after closing and reopening their browser, as long as their Azure AD tokens are valid or can be refreshed.
+
+### Configuration Settings
+
+The persistent login behavior is controlled in `src/NbgDev.Pst.Web/Program.cs` and `appsettings.json`:
+
+**Program.cs Configuration:**
+```csharp
+// Get the authentication cookie expiration configuration once
+var authCookieExpireDays = Math.Clamp(
+    builder.Configuration.GetValue<int?>("AuthenticationCookieExpireDays") ?? 7,
+    1, 30);
+
+// Add distributed cache for token persistence across app restarts
+builder.Services.AddDistributedMemoryCache();
+
+// Enable persistent cookies
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(options =>
+    {
+        builder.Configuration.GetSection("AzureAd").Bind(options);
+        options.SaveTokens = true;  // Persist tokens for refresh
+        
+        // Configure the authentication ticket to be persistent
+        options.Events = new OpenIdConnectEvents
+        {
+            OnTicketReceived = context =>
+            {
+                // Make the authentication ticket persistent across browser sessions
+                if (context.Properties != null)
+                {
+                    context.Properties.IsPersistent = true;
+                    context.Properties.ExpiresUtc = DateTimeOffset.UtcNow.AddDays(authCookieExpireDays);
+                }
+                return Task.CompletedTask;
+            }
+        };
+    })
+    .EnableTokenAcquisitionToCallDownstreamApi()
+    .AddDistributedTokenCaches(); // Use distributed cache to persist tokens
+
+// Configure cookie persistence
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = builder.Environment.IsDevelopment() 
+        ? CookieSecurePolicy.SameAsRequest 
+        : CookieSecurePolicy.Always;
+    options.Cookie.SameSite = SameSiteMode.Lax;
+    
+    options.ExpireTimeSpan = TimeSpan.FromDays(authCookieExpireDays);
+    options.SlidingExpiration = true;
+    options.Cookie.IsEssential = true;
+});
+```
+
+**appsettings.json Configuration:**
+```json
+{
+  "AuthenticationCookieExpireDays": 7
+}
+```
+
+### Token Cache Configuration
+
+**Important**: This implementation uses a **distributed token cache** instead of in-memory caching to prevent `MicrosoftIdentityWebChallengeUserException` (IDW10502) errors.
+
+#### Why Distributed Cache?
+
+When using persistent cookies with in-memory token caches:
+- **Problem**: App restart clears the in-memory token cache, but persistent cookies remain
+- **Result**: User appears authenticated (has cookie) but token acquisition fails (cache empty)
+- **Error**: `MicrosoftIdentityWebChallengeUserException: IDW10502`
+
+**Solution**: Use `.AddDistributedTokenCaches()` with a distributed cache provider:
+
+```csharp
+// Add distributed cache
+builder.Services.AddDistributedMemoryCache(); // For development
+
+// Use distributed token cache
+.AddDistributedTokenCaches();
+```
+
+#### Cache Options
+
+**This Application (Implemented):**
+The application is configured to use **Redis** for distributed token caching:
+
+```csharp
+var redisConnectionString = builder.Configuration.GetConnectionString("redis");
+if (!string.IsNullOrEmpty(redisConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+        options.InstanceName = "PstTokenCache:";
+    });
+}
+else
+{
+    // Fallback for local development without Redis
+    builder.Services.AddDistributedMemoryCache();
+}
+```
+
+**Infrastructure:**
+- **Development (AppHost)**: Redis runs as container with Docker volume
+- **Production (Azure)**: Redis deployed as Azure Container App with Azure File persistence
+
+**Alternative Options:**
+- **SQL Server**:
+  ```csharp
+  builder.Services.AddDistributedSqlServerCache(options =>
+  {
+      options.ConnectionString = builder.Configuration.GetConnectionString("TokenCache");
+      options.SchemaName = "dbo";
+      options.TableName = "TokenCache";
+  });
+  ```
+- **Azure Cosmos DB** or other `IDistributedCache` implementations
+
+This ensures tokens persist across app restarts and scales to multiple server instances.
+
+### Customizing Cookie Expiration
+
+To change the duration of persistent login:
+
+1. Edit `appsettings.json` and modify the `AuthenticationCookieExpireDays` value
+2. For environment-specific settings, override in `appsettings.Development.json` or `appsettings.Production.json`
+3. Valid range: 1-30 days (values outside this range will be clamped)
+4. Recommended values:
+   - Development: 7-14 days
+   - Production: 7 days (balance between UX and security)
+
+### Security Considerations
+
+- **Sliding Expiration**: The cookie expiration extends with each request, keeping active users logged in
+- **Token Refresh**: Azure AD refresh tokens are automatically used to acquire new access tokens
+- **Secure Cookies**: In production, cookies are only transmitted over HTTPS
+- **HttpOnly**: Cookies are inaccessible to client-side JavaScript, preventing XSS attacks
+- **SameSite**: Lax setting provides CSRF protection while maintaining usability
+
 ## Additional Resources
 
 - [Microsoft Identity Platform documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/)
