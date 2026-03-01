@@ -181,7 +181,7 @@ jobs:
 
     steps:
     - name: Download SBOM artifacts
-      uses: actions/download-artifact@v4
+      uses: actions/download-artifact@f44cd7b40bfd40b6aa1cc1b9b5b7bf03d3c6710c # v4
       with:
         pattern: sbom-*
         merge-multiple: true
