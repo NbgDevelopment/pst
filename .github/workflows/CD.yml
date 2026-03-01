@@ -17,6 +17,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
 
     steps:
     - uses: actions/checkout@v4
@@ -94,6 +95,27 @@ jobs:
         tags: ${{ steps.metaProcessing.outputs.tags }}
         labels: ${{ steps.metaProcessing.outputs.labels }}
 
+    - name: Generate SBOM for API image
+      uses: anchore/sbom-action@v0.17.6
+      with:
+        image: ${{ env.REGISTRY }}/nbgdevelopment/pst-api:${{ steps.imageTag.outputs.tag }}
+        artifact-name: sbom-pst-api.spdx.json
+        output-file: ./sbom-pst-api.spdx.json
+
+    - name: Generate SBOM for Web image
+      uses: anchore/sbom-action@v0.17.6
+      with:
+        image: ${{ env.REGISTRY }}/nbgdevelopment/pst-web:${{ steps.imageTag.outputs.tag }}
+        artifact-name: sbom-pst-web.spdx.json
+        output-file: ./sbom-pst-web.spdx.json
+
+    - name: Generate SBOM for Processing image
+      uses: anchore/sbom-action@v0.17.6
+      with:
+        image: ${{ env.REGISTRY }}/nbgdevelopment/pst-processing:${{ steps.imageTag.outputs.tag }}
+        artifact-name: sbom-pst-processing.spdx.json
+        output-file: ./sbom-pst-processing.spdx.json
+
     - name: Output image tag
       run: echo "Image tag ${{ steps.imageTag.outputs.tag }} published" >> $GITHUB_STEP_SUMMARY
 
@@ -148,3 +170,25 @@ jobs:
         ARM_CLIENT_ID: ${{ vars.DEPLOYMENT_CLIENT_ID }}
         ARM_SUBSCRIPTION_ID: "${{ vars.SUBSCRIPTION_ID }}"
         ARM_TENANT_ID: ${{ vars.DEPLOYMENT_TENANT_ID }}
+
+  release:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - name: Download SBOM artifacts
+      uses: actions/download-artifact@f44cd7b40bfd40b6aa1cc1b9b5b7bf03d3c6710c # v4
+      with:
+        pattern: sbom-*
+        merge-multiple: true
+
+    - name: Create GitHub Release with SBOMs
+      uses: softprops/action-gh-release@a06a81a03ee405af7f2048a818ed3f03bbf83c7b # v2.5.0
+      with:
+        tag_name: ${{ needs.build.outputs.imageTag }}
+        name: Release ${{ needs.build.outputs.imageTag }}
+        files: "*.spdx.json"
