@@ -96,21 +96,21 @@ jobs:
         labels: ${{ steps.metaProcessing.outputs.labels }}
 
     - name: Generate SBOM for API image
-      uses: anchore/sbom-action@v0
+      uses: anchore/sbom-action@v0.17.6
       with:
         image: ${{ env.REGISTRY }}/nbgdevelopment/pst-api:${{ steps.imageTag.outputs.tag }}
         artifact-name: sbom-pst-api.spdx.json
         output-file: ./sbom-pst-api.spdx.json
 
     - name: Generate SBOM for Web image
-      uses: anchore/sbom-action@v0
+      uses: anchore/sbom-action@v0.17.6
       with:
         image: ${{ env.REGISTRY }}/nbgdevelopment/pst-web:${{ steps.imageTag.outputs.tag }}
         artifact-name: sbom-pst-web.spdx.json
         output-file: ./sbom-pst-web.spdx.json
 
     - name: Generate SBOM for Processing image
-      uses: anchore/sbom-action@v0
+      uses: anchore/sbom-action@v0.17.6
       with:
         image: ${{ env.REGISTRY }}/nbgdevelopment/pst-processing:${{ steps.imageTag.outputs.tag }}
         artifact-name: sbom-pst-processing.spdx.json
